@@ -120,5 +120,26 @@ class Project
             return false;
         }
     }
+    /**
+     * Delete a project
+     */
+    public function delete()
+    {
+        $query = 'DELETE FROM ' . $this->table . ' WHERE id = :id';
+        $stmt = $this->conn->prepare($query);
+
+        $this->id = htmlspecialchars(strip_tags($this->id));
+        $stmt->bindParam(':id', $this->id);
+
+        try {
+            if ($stmt->execute()) {
+                return true;
+            }
+            return false;
+        } catch (PDOException $e) {
+            printf("Error: %s.\n", $e->getMessage());
+            return false;
+        }
+    }
 }
 ?>

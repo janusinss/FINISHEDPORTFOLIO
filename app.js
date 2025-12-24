@@ -865,6 +865,34 @@ function openEditModal(type, id) {
   modal.classList.add("active");
 }
 
+function openAddModal(type) {
+  const modal = document.getElementById("edit-modal");
+  document.getElementById("edit-form").reset();
+  document.getElementById("edit-id").value = ""; // Empty ID signals "Add"
+  document.getElementById("edit-type").value = type;
+
+  // Reset Labels
+  const labelSubtitle = document.getElementById("label-subtitle");
+  if (type === "project") {
+    if (labelSubtitle) labelSubtitle.innerText = "Project URL";
+  } else {
+    if (labelSubtitle)
+      labelSubtitle.innerText = "Subtitle / Role / Proficiency";
+  }
+
+  // Visibility Logic
+  const groupSubtitle = document.getElementById("group-subtitle");
+  const groupDesc = document.getElementById("group-desc");
+  groupSubtitle.style.display = "block";
+  groupDesc.style.display = "block";
+
+  if (type === "skill") groupDesc.style.display = "none";
+  else if (["education", "certification", "achievement"].includes(type))
+    groupDesc.style.display = "none";
+
+  modal.classList.add("active");
+}
+
 function closeEditModal() {
   document.getElementById("edit-modal").classList.remove("active");
 }
@@ -879,65 +907,87 @@ document.getElementById("edit-form").addEventListener("submit", async (e) => {
 
   // 1. Prepare Payload & Endpoint
   let endpoint = "";
-  let payload = { action: "update", id: id };
+  const action = id ? "update" : "add"; // Detect Action
+  let payload = { action: action };
+  if (id) payload.id = id;
+
+  const today = new Date().toISOString().split("T")[0]; // Default date
 
   if (type === "project") {
     endpoint = "projects_api.php";
     payload.title = rawData.title;
-    payload.project_url = rawData.subtitle; // Map URL from Subtitle field
+    payload.project_url = rawData.subtitle;
     payload.description = rawData.description;
   } else if (type === "skill") {
     endpoint = "skills_api.php";
-    payload.name = rawData.title; // Map Title -> Name
-    payload.proficiency = rawData.subtitle; // Map Subtitle -> Proficiency
-    // Ensure category_id is preserved if needed, or backend handles it.
-    // We might need to fetch the original item to keep missing fields.
-    const original = window.siteData.skills.find((s) => s.id == id);
-    if (original) payload.category_id = original.category_id;
+    payload.name = rawData.title;
+    payload.proficiency = rawData.subtitle;
+
+    // Default or Preserve Category
+    if (action === "add") payload.category_id = 1;
+    else {
+      const original = window.siteData.skills.find((s) => s.id == id);
+      if (original) payload.category_id = original.category_id;
+    }
   } else if (type === "experience") {
     endpoint = "experience_api.php";
-    payload.position = rawData.title; // Map Title -> Position
-    payload.company = rawData.subtitle; // Map Subtitle -> Company
+    payload.position = rawData.title;
+    payload.company = rawData.subtitle;
     payload.description = rawData.description;
 
-    // Preserve dates from original
-    const original = window.siteData["experience-list"]?.find(
-      (e) => e.id == id
-    );
-    if (original) {
-      payload.start_date = original.start_date;
-      payload.end_date = original.end_date;
-      payload.is_current = original.is_current;
+    if (action === "add") {
+      payload.start_date = today;
+      payload.is_current = true;
+    } else {
+      const original = window.siteData["experience-list"]?.find(
+        (e) => e.id == id
+      );
+      if (original) {
+        payload.start_date = original.start_date;
+        payload.end_date = original.end_date;
+        payload.is_current = original.is_current;
+      }
     }
   } else if (type === "education") {
     endpoint = "education_api.php";
-    payload.degree = rawData.title; // Map Title -> Degree
-    payload.institution = rawData.subtitle; // Map Subtitle -> Institution
+    payload.degree = rawData.title;
+    payload.institution = rawData.subtitle;
     payload.description = rawData.description;
 
-    const original = window.siteData["education-list"]?.find((e) => e.id == id);
-    if (original) {
-      payload.start_date = original.start_date;
-      payload.end_date = original.end_date;
-      payload.is_current = original.is_current;
-      payload.grade = original.grade;
-      payload.location = original.location;
-      payload.field_of_study = original.field_of_study;
+    if (action === "add") {
+      payload.start_date = today;
+      payload.is_current = true;
+    } else {
+      const original = window.siteData["education-list"]?.find(
+        (e) => e.id == id
+      );
+      if (original) {
+        payload.start_date = original.start_date;
+        payload.end_date = original.end_date;
+        payload.is_current = original.is_current;
+        payload.grade = original.grade;
+        payload.location = original.location;
+        payload.field_of_study = original.field_of_study;
+      }
     }
   } else if (type === "certification") {
     endpoint = "certifications_api.php";
-    payload.title = rawData.title; // Map Title -> Title
-    payload.issuing_organization = rawData.subtitle; // Map Subtitle -> Issuing Org
+    payload.title = rawData.title;
+    payload.issuing_organization = rawData.subtitle;
     payload.description = rawData.description;
 
-    const original = window.siteData["certifications-list"]?.find(
-      (e) => e.id == id
-    );
-    if (original) {
-      payload.issue_date = original.issue_date;
-      payload.expiry_date = original.expiry_date;
-      payload.credential_id = original.credential_id; // Add ID
-      payload.credential_url = original.credential_url;
+    if (action === "add") {
+      payload.issue_date = today;
+    } else {
+      const original = window.siteData["certifications-list"]?.find(
+        (e) => e.id == id
+      );
+      if (original) {
+        payload.issue_date = original.issue_date;
+        payload.expiry_date = original.expiry_date;
+        payload.credential_id = original.credential_id;
+        payload.credential_url = original.credential_url;
+      }
     }
   } else if (type === "achievement") {
     endpoint = "achievements_api.php";
@@ -945,12 +995,17 @@ document.getElementById("edit-form").addEventListener("submit", async (e) => {
     payload.issuing_organization = rawData.subtitle;
     payload.description = rawData.description;
 
-    const original = window.siteData["achievements-list"]?.find(
-      (e) => e.id == id
-    );
-    if (original) {
-      payload.date_achieved = original.date_achieved;
-      payload.category = original.category; // Also preserve category
+    if (action === "add") {
+      payload.date_achieved = today;
+      payload.category = "other";
+    } else {
+      const original = window.siteData["achievements-list"]?.find(
+        (e) => e.id == id
+      );
+      if (original) {
+        payload.date_achieved = original.date_achieved;
+        payload.category = original.category;
+      }
     }
   }
 

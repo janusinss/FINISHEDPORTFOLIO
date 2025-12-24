@@ -502,6 +502,15 @@ body.admin-mode .admin-controls {
   display: flex !important;
 }
 
+.section-controls {
+  display: none;
+  align-items: center;
+  gap: 1rem;
+}
+body.admin-mode .section-controls {
+  display: flex !important;
+}
+
 .admin-action-btn {
   border: none;
   padding: 0.25rem 0.75rem;

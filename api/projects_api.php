@@ -49,17 +49,26 @@ if ($method === 'GET') {
 
     switch ($data->action) {
         case 'add':
-            // ... Add Logic ...
-            http_response_code(501);
-            echo json_encode(array('message' => 'Add Not Implemented'));
+            $project->title = $data->title;
+            $project->description = $data->description;
+            $project->project_url = $data->project_url ?? '#';
+            $project->repo_url = $data->repo_url ?? '#';
+            $project->project_date = $data->project_date ?? date('Y-m-d');
+            $project->image_url = $data->image_url ?? 'https://placehold.co/600x400/555/FFF?text=Project';
+
+            if ($project->add()) {
+                http_response_code(201);
+                echo json_encode(array('message' => 'Project Added', 'id' => $project->id));
+            } else {
+                http_response_code(500);
+                echo json_encode(array('message' => 'Project Not Added'));
+            }
             break;
 
         case 'update':
             $project->id = $data->id;
             $project->title = $data->title;
             $project->description = $data->description;
-            // Handle optional fields or default them logic if needed, 
-            // but Project.php expects them. Ideally we pass current values if not modified.
             $project->project_url = $data->project_url ?? '#';
             $project->repo_url = $data->repo_url ?? '#';
             $project->project_date = $data->project_date ?? date('Y-m-d');
@@ -75,9 +84,15 @@ if ($method === 'GET') {
             break;
 
         case 'delete':
-            // ... Delete Logic (Future) ...
-            http_response_code(501);
-            echo json_encode(array('message' => 'Delete Not Implemented'));
+            $project->id = $data->id;
+
+            if ($project->delete()) {
+                http_response_code(200);
+                echo json_encode(array('message' => 'Project Deleted'));
+            } else {
+                http_response_code(500);
+                echo json_encode(array('message' => 'Project Not Deleted'));
+            }
             break;
 
         default:

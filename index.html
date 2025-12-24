@@ -99,12 +99,22 @@
                 </section>
 
                 <section id="projects" class="mb-32">
-                    <h2 class="section-title" data-scramble>Selected Projects</h2>
+                    <div class="flex items-center justify-between mb-12">
+                        <h2 class="section-title mb-0" data-scramble>Selected Projects</h2>
+                        <div class="section-controls">
+                            <button class="admin-action-btn edit-btn" onclick="openAddModal('project')">+ ADD PROJECT</button>
+                        </div>
+                    </div>
                     <div id="projects-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-8"></div>
                 </section>
 
                 <section id="skills" class="mb-32">
-                    <h2 class="section-title" data-scramble>Technical Arsenal</h2>
+                    <div class="flex items-center justify-between mb-12">
+                        <h2 class="section-title mb-0" data-scramble>Technical Arsenal</h2>
+                        <div class="section-controls">
+                            <button class="admin-action-btn edit-btn" onclick="openAddModal('skill')">+ ADD SKILL</button>
+                        </div>
+                    </div>
                     <div id="skills-container" class="flex flex-wrap gap-3"></div>
                 </section>
 
@@ -113,23 +123,41 @@
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
                         <div class="space-y-12">
                             <div>
-                                <h3 class="text-xs font-mono text-accent mb-6 uppercase tracking-wider">Experience</h3>
+                                <div class="flex items-center justify-between mb-6">
+                                    <h3 class="text-xs font-mono text-accent uppercase tracking-wider mb-0">Experience</h3>
+                                    <div class="section-controls">
+                                        <button class="admin-action-btn edit-btn text-[10px]" onclick="openAddModal('experience')">+ ADD</button>
+                                    </div>
+                                </div>
                                 <div id="experience-list" class="space-y-6"></div>
                             </div>
                             <div>
-                                <h3 class="text-xs font-mono text-accent mb-6 uppercase tracking-wider">Education</h3>
+                                <div class="flex items-center justify-between mb-6">
+                                    <h3 class="text-xs font-mono text-accent uppercase tracking-wider mb-0">Education</h3>
+                                    <div class="section-controls">
+                                        <button class="admin-action-btn edit-btn text-[10px]" onclick="openAddModal('education')">+ ADD</button>
+                                    </div>
+                                </div>
                                 <div id="education-list" class="space-y-6"></div>
                             </div>
                         </div>
                         <div class="space-y-12">
                             <div>
-                                <h3 class="text-xs font-mono text-accent mb-6 uppercase tracking-wider">Certifications
-                                </h3>
+                                <div class="flex items-center justify-between mb-6">
+                                    <h3 class="text-xs font-mono text-accent uppercase tracking-wider mb-0">Certifications</h3>
+                                    <div class="section-controls">
+                                        <button class="admin-action-btn edit-btn text-[10px]" onclick="openAddModal('certification')">+ ADD</button>
+                                    </div>
+                                </div>
                                 <div id="certifications-list" class="space-y-6"></div>
                             </div>
                             <div>
-                                <h3 class="text-xs font-mono text-accent mb-6 uppercase tracking-wider">Achievements
-                                </h3>
+                                <div class="flex items-center justify-between mb-6">
+                                    <h3 class="text-xs font-mono text-accent uppercase tracking-wider mb-0">Achievements</h3>
+                                    <div class="section-controls">
+                                        <button class="admin-action-btn edit-btn text-[10px]" onclick="openAddModal('achievement')">+ ADD</button>
+                                    </div>
+                                </div>
                                 <div id="achievements-list" class="space-y-6"></div>
                             </div>
                         </div>
