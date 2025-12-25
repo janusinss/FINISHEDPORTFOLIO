@@ -44,12 +44,13 @@ html.lenis {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-
-body.custom-cursor-active,
-body.custom-cursor-active * {
   cursor: none !important;
 }
+
+/* body.custom-cursor-active,
+body.custom-cursor-active * {
+  cursor: none !important;
+} */
 
 body {
   font-family: "Inter", sans-serif;
