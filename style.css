@@ -333,6 +333,20 @@ textarea:focus {
   }
 }
 
+/* === DELETE MODAL (Mirrors Edit Modal) === */
+#delete-modal {
+  display: none;
+}
+#delete-modal.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#delete-modal.active .modal-content {
+  transform: scale(1);
+  opacity: 1;
+}
+
 .reveal-text {
   overflow: hidden;
   display: block;

@@ -1085,13 +1085,15 @@ function showToast(message, type = "success") {
 }
 
 async function deleteItem(type, id) {
-  if (
-    !confirm(
-      `Are you sure you want to delete this ${type}? THIS ACTION CANNOT BE UNDONE.`
-    )
-  )
-    return;
+  // OLD: confirm()
+  // NEW: Open Custom Modal
+  openDeleteModal(`Are you sure you want to delete this ${type}?`, async () => {
+    // Callback when "DELETE" is clicked in modal
+    await performDelete(type, id);
+  });
+}
 
+async function performDelete(type, id) {
   let endpoint = "";
   switch (type) {
     case "project":
@@ -1142,3 +1144,55 @@ async function deleteItem(type, id) {
     showToast("SYSTEM ERROR DURING DELETE", "error");
   }
 }
+
+// ==========================================
+// Custom Delete Modal Logic
+// ==========================================
+let deleteConfirmCallback = null;
+
+function openDeleteModal(message, onConfirm) {
+  const modal = document.getElementById("delete-modal");
+  const messageEl = document.getElementById("delete-message");
+
+  if (message) {
+    // preserve the warning span styled in HTML
+    messageEl.innerHTML = `${message} <br><span class="text-[#ef4444] font-bold mt-4 block uppercase tracking-widest text-xs border border-[#ef4444] p-2 inline-block bg-[rgba(239,68,68,0.1)]">⚠ This action cannot be undone.</span>`;
+  }
+
+  deleteConfirmCallback = onConfirm;
+
+  // Use .active for flex display (matches CSS)
+  modal.classList.add("active");
+
+  // Animate in (Optional: GSAP can still be used for flair, or rely on CSS transition)
+  // CSS handles opacity/scale, but we can enforce it here too just in case
+}
+
+function closeDeleteModal() {
+  const modal = document.getElementById("delete-modal");
+
+  modal.classList.remove("active");
+  deleteConfirmCallback = null;
+}
+
+// Event Listeners for Modal
+document.addEventListener("DOMContentLoaded", () => {
+  const cancelBtn = document.getElementById("cancel-delete");
+  const confirmBtn = document.getElementById("confirm-delete");
+  const backdrop = document.getElementById("delete-backdrop");
+
+  if (cancelBtn) cancelBtn.addEventListener("click", closeDeleteModal);
+  if (backdrop) backdrop.addEventListener("click", closeDeleteModal);
+
+  if (confirmBtn) {
+    confirmBtn.addEventListener("click", () => {
+      if (deleteConfirmCallback) {
+        deleteConfirmCallback();
+      }
+      closeDeleteModal();
+    });
+  }
+
+  // Expose to window for inline calls if needed
+  window.openDeleteModal = openDeleteModal;
+});
