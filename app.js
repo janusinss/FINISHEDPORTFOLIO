@@ -73,6 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "achievements-list",
     renderSimpleCard("achievement")
   );
+  loadGeneric("hobbies_api.php", "hobbies-list", renderHobby);
 
   setupContactForm();
 });
@@ -511,6 +512,17 @@ const renderSimpleCard = (type) => (item) =>
     </div>
 `;
 
+const renderHobby = (h) => `
+    <div class="info-card p-6 opacity-0 translate-y-8 relative">
+        <div class="admin-controls">
+            <button class="admin-action-btn edit-btn" onclick="openEditModal('hobby', ${h.id})">EDIT</button>
+            <button class="admin-action-btn del-btn" onclick="deleteItem('hobby', ${h.id})">DEL</button>
+        </div>
+        <h4 class="font-bold text-lg mb-2" data-scramble>${h.name}</h4>
+        <p class="text-sm text-secondary/80 leading-relaxed">${h.description}</p>
+    </div>
+`;
+
 // === FORM & SYSTEM ===
 function setupContactForm() {
   const form = document.getElementById("contact-form");
@@ -811,6 +823,8 @@ function openEditModal(type, id) {
     item = window.siteData["certifications-list"]?.find((i) => i.id == id);
   else if (type === "achievement")
     item = window.siteData["achievements-list"]?.find((i) => i.id == id);
+  else if (type === "hobby")
+    item = window.siteData["hobbies-list"]?.find((i) => i.id == id);
 
   if (!item) {
     console.error("Item not found:", type, id);
@@ -859,6 +873,9 @@ function openEditModal(type, id) {
   } else if (["education", "certification", "achievement"].includes(type)) {
     // Remove Description for Background
     groupDesc.style.display = "none";
+  } else if (type === "hobby") {
+    // Hide Subtitle, Show Description
+    groupSubtitle.style.display = "none";
   }
   // Experience keeps everything
 
@@ -889,6 +906,7 @@ function openAddModal(type) {
   if (type === "skill") groupDesc.style.display = "none";
   else if (["education", "certification", "achievement"].includes(type))
     groupDesc.style.display = "none";
+  else if (type === "hobby") groupSubtitle.style.display = "none";
 
   modal.classList.add("active");
 }
@@ -1007,6 +1025,10 @@ document.getElementById("edit-form").addEventListener("submit", async (e) => {
         payload.category = original.category;
       }
     }
+  } else if (type === "hobby") {
+    endpoint = "hobbies_api.php";
+    payload.name = rawData.title;
+    payload.description = rawData.description;
   }
 
   if (!endpoint) {
@@ -1113,6 +1135,9 @@ async function performDelete(type, id) {
       break;
     case "achievement":
       endpoint = "achievements_api.php";
+      break;
+    case "hobby":
+      endpoint = "hobbies_api.php";
       break;
     default:
       console.error("Unknown type for delete:", type);

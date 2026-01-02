@@ -34,8 +34,62 @@ if ($method === 'GET') {
         http_response_code(200);
         echo json_encode(array());
     }
+} elseif ($method === 'POST') {
+    $data = json_decode(file_get_contents("php://input"));
+
+    if (!isset($data->action)) {
+        http_response_code(400);
+        echo json_encode(array('message' => 'Action parameter is required.'));
+        exit;
+    }
+
+    switch ($data->action) {
+        case 'add':
+            $hobby->name = $data->name;
+            $hobby->description = $data->description;
+
+            if ($hobby->add()) {
+                http_response_code(201);
+                echo json_encode(array('message' => 'Hobby Added', 'id' => $hobby->id));
+            } else {
+                http_response_code(500);
+                echo json_encode(array('message' => 'Hobby Not Added'));
+            }
+            break;
+
+        case 'update':
+            $hobby->id = $data->id;
+            $hobby->name = $data->name;
+            $hobby->description = $data->description;
+
+            if ($hobby->update()) {
+                http_response_code(200);
+                echo json_encode(array('message' => 'Hobby Updated'));
+            } else {
+                http_response_code(500);
+                echo json_encode(array('message' => 'Hobby Not Updated'));
+            }
+            break;
+
+        case 'delete':
+            $hobby->id = $data->id;
+
+            if ($hobby->delete()) {
+                http_response_code(200);
+                echo json_encode(array('message' => 'Hobby Deleted'));
+            } else {
+                http_response_code(500);
+                echo json_encode(array('message' => 'Hobby Not Deleted'));
+            }
+            break;
+
+        default:
+            http_response_code(400);
+            echo json_encode(array('message' => 'Invalid action.'));
+            break;
+    }
 } else {
     http_response_code(405);
-    echo json_encode(array('message' => 'Method Not Allowed (GET only)'));
+    echo json_encode(array('message' => 'Method Not Allowed'));
 }
 ?>
