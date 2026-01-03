@@ -391,7 +391,7 @@ async function loadProfile() {
     document.getElementById("contact-info").innerHTML = `
             <div class="flex justify-between border-b border-gray-500/30 pb-2"><span>EMAIL</span> <span>${data.email}</span></div>
             <div class="flex justify-between border-b border-gray-500/30 pb-2 pt-2"><span>PHONE</span> <span>${data.phone}</span></div>
-            <div class="pt-4"><a href="${data.facebook_url}" class="text-accent hover:underline">FACEBOOK LINK_</a></div>
+            <div class="pt-4"><a href="${data.facebook_url}" target="_blank" class="text-accent hover:underline">FACEBOOK LINK_</a></div>
         `;
   } catch (e) {
     console.error("Error loading profile:", e);
