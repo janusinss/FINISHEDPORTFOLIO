@@ -76,7 +76,15 @@ VALUES ('PHP', 1),
     ('Git & GitHub', 4),
     ('VS Code', 4),
     ('Problem Solving', 5),
-    ('Team Collaboration', 5);
+    ('Team Collaboration', 5),
+    ('Full-Stack Developer', 1),
+    ('Software Engineer', 1),
+    ('TypeScript', 1),
+    ('Laravel', 2),
+    ('Node.js', 2),
+    ('MongoDB', 3),
+    ('Docker', 4),
+    ('Communication', 5);
 CREATE TABLE projects (
     id INT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(150) NOT NULL,
@@ -134,6 +142,16 @@ VALUES (
         'https://dominic-lab09.netlify.app/#',
         'https://github.com/janusinss/fitness-gym',
         'https://placehold.co/600x400/16a34a/FFF?text=Fitness+Gym',
+        '2023-11-10',
+        'completed',
+        FALSE
+    ),
+    (
+        'BlitzType',
+        "A typing game that challenges players to type as fast as possible. It features a leaderboard and a timer to keep track of the player's progress",
+        'https://blitztype-5cd8b.web.app/',
+        '#',
+        '#',
         '2023-11-10',
         'completed',
         FALSE
