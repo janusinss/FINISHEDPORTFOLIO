@@ -7,7 +7,7 @@ class Skill
     // Properties
     public $id;
     public $name;
-    public $proficiency;
+    // public $proficiency; // Removed
     public $category_id;
     public $category_name; // For JOIN
 
@@ -25,14 +25,13 @@ class Skill
                     c.name as category_name,
                     s.id,
                     s.name,
-                    s.proficiency,
                     s.category_id
                   FROM
                     ' . $this->table . ' s
                   LEFT JOIN
                     skill_categories c ON s.category_id = c.id
                   ORDER BY
-                    s.proficiency DESC';
+                    s.id DESC';
 
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -45,18 +44,16 @@ class Skill
     public function add()
     {
         $query = 'INSERT INTO ' . $this->table . '
-                  SET name = :name, proficiency = :proficiency, category_id = :category_id';
+                  SET name = :name, category_id = :category_id';
 
         $stmt = $this->conn->prepare($query);
 
         // Clean data
         $this->name = htmlspecialchars(strip_tags($this->name));
-        $this->proficiency = htmlspecialchars(strip_tags($this->proficiency));
         $this->category_id = htmlspecialchars(strip_tags($this->category_id));
 
         // Bind data
         $stmt->bindParam(':name', $this->name);
-        $stmt->bindParam(':proficiency', $this->proficiency);
         $stmt->bindParam(':category_id', $this->category_id);
 
         try {
@@ -79,7 +76,6 @@ class Skill
         $query = 'UPDATE ' . $this->table . '
                   SET
                       name = :name,
-                      proficiency = :proficiency,
                       category_id = :category_id
                   WHERE
                       id = :id';
@@ -89,13 +85,11 @@ class Skill
         // Clean data
         $this->id = htmlspecialchars(strip_tags($this->id));
         $this->name = htmlspecialchars(strip_tags($this->name));
-        $this->proficiency = htmlspecialchars(strip_tags($this->proficiency));
         $this->category_id = htmlspecialchars(strip_tags($this->category_id));
 
         // Bind data
         $stmt->bindParam(':id', $this->id);
         $stmt->bindParam(':name', $this->name);
-        $stmt->bindParam(':proficiency', $this->proficiency);
         $stmt->bindParam(':category_id', $this->category_id);
 
 

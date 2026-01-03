@@ -412,7 +412,7 @@ async function loadProjects() {
                     <button class="admin-action-btn del-btn" onclick="deleteItem('project', ${p.id})">DEL</button>
                 </div>
                 <div class="mb-6 border-b border-gray-500/20 pb-6">
-                     <h3 class="text-3xl font-bold mb-2 transition-colors" data-scramble>${p.title}</h3>
+                     <h3 class="text-3xl font-bold mb-2 transition-colors">${p.title}</h3>
                 </div>
                 <p class="text-sm text-secondary mb-8 leading-relaxed flex-grow">${p.description}</p>
                 <div class="flex justify-between text-xs font-mono tracking-widest mt-auto">
@@ -447,10 +447,10 @@ async function loadSkills() {
         (s) => `
             <div class="skill-tag px-4 py-3 opacity-0 translate-y-4 text-xs font-mono border border-gray-500/30 transition-colors cursor-default relative overflow-hidden">
                 <div class="admin-controls">
-                    <button class="admin-action-btn edit-btn" onclick="openEditModal('skill', ${s.id})">EDIT</button>
-                    <button class="admin-action-btn del-btn" onclick="deleteItem('skill', ${s.id})">DEL</button>
+                    <button class="admin-action-btn edit-btn text-[0.5rem] px-1.5 py-0.5 h-auto min-h-0" onclick="openEditModal('skill', ${s.id})">EDIT</button>
+                    <button class="admin-action-btn del-btn text-[0.5rem] px-1.5 py-0.5 h-auto min-h-0" onclick="deleteItem('skill', ${s.id})">DEL</button>
                 </div>
-                ${s.name} <span class="text-accent">// ${s.proficiency}%</span>
+                ${s.name}
             </div>
         `
       )
@@ -485,7 +485,7 @@ const renderExperience = (exp) => `
             <button class="admin-action-btn del-btn" onclick="deleteItem('experience', ${exp.id})">DEL</button>
         </div>
         <div class="flex justify-between items-baseline mb-2">
-            <h4 class="font-bold text-lg" data-scramble>${exp.position}</h4>
+            <h4 class="font-bold text-lg">${exp.position}</h4>
         </div>
         <p class="text-sm font-mono mb-4 text-secondary">${exp.company}</p>
         <p class="text-sm text-secondary/80 leading-relaxed">${exp.description}</p>
@@ -503,9 +503,7 @@ const renderSimpleCard = (type) => (item) =>
     item.id
   })">DEL</button>
         </div>
-        <h4 class="font-bold text-lg mb-1" data-scramble>${
-          item.degree || item.title
-        }</h4>
+        <h4 class="font-bold text-lg mb-1">${item.degree || item.title}</h4>
         <p class="text-sm font-mono text-accent">${
           item.institution || item.issuing_organization
         }</p>
@@ -518,7 +516,7 @@ const renderHobby = (h) => `
             <button class="admin-action-btn edit-btn" onclick="openEditModal('hobby', ${h.id})">EDIT</button>
             <button class="admin-action-btn del-btn" onclick="deleteItem('hobby', ${h.id})">DEL</button>
         </div>
-        <h4 class="font-bold text-lg mb-2" data-scramble>${h.name}</h4>
+        <h4 class="font-bold text-lg mb-2">${h.name}</h4>
         <p class="text-sm text-secondary/80 leading-relaxed">${h.description}</p>
     </div>
 `;
@@ -850,8 +848,7 @@ function openEditModal(type, id) {
       item.institution ||
       item.issuing_organization ||
       "";
-    if (labelSubtitle)
-      labelSubtitle.innerText = "Subtitle / Role / Proficiency";
+    if (labelSubtitle) labelSubtitle.innerText = "Subtitle / Role";
   }
 
   document.getElementById("edit-desc").value = item.description || "";
@@ -868,8 +865,9 @@ function openEditModal(type, id) {
     // Show Subtitle (as URL), Keep Description
     groupSubtitle.style.display = "block";
   } else if (type === "skill") {
-    // Remove Description for Skills
+    // Remove Description and Subtitle for Skills (Name only)
     groupDesc.style.display = "none";
+    groupSubtitle.style.display = "none";
   } else if (["education", "certification", "achievement"].includes(type)) {
     // Remove Description for Background
     groupDesc.style.display = "none";
@@ -893,8 +891,7 @@ function openAddModal(type) {
   if (type === "project") {
     if (labelSubtitle) labelSubtitle.innerText = "Project URL";
   } else {
-    if (labelSubtitle)
-      labelSubtitle.innerText = "Subtitle / Role / Proficiency";
+    if (labelSubtitle) labelSubtitle.innerText = "Subtitle / Role";
   }
 
   // Visibility Logic
@@ -903,8 +900,10 @@ function openAddModal(type) {
   groupSubtitle.style.display = "block";
   groupDesc.style.display = "block";
 
-  if (type === "skill") groupDesc.style.display = "none";
-  else if (["education", "certification", "achievement"].includes(type))
+  if (type === "skill") {
+    groupDesc.style.display = "none";
+    groupSubtitle.style.display = "none";
+  } else if (["education", "certification", "achievement"].includes(type))
     groupDesc.style.display = "none";
   else if (type === "hobby") groupSubtitle.style.display = "none";
 
@@ -939,7 +938,8 @@ document.getElementById("edit-form").addEventListener("submit", async (e) => {
   } else if (type === "skill") {
     endpoint = "skills_api.php";
     payload.name = rawData.title;
-    payload.proficiency = rawData.subtitle;
+
+    // payload.proficiency = rawData.subtitle; // Removed
 
     // Default or Preserve Category
     if (action === "add") payload.category_id = 1;

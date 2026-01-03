@@ -26,7 +26,6 @@ if ($method === 'GET') {
             $skill_item = array(
                 'id' => $id,
                 'name' => $name,
-                'proficiency' => $proficiency,
                 'category_id' => $category_id ?? null,
                 'category_name' => $category_name ?? 'Uncategorized'
             );
@@ -50,7 +49,6 @@ if ($method === 'GET') {
     switch ($data->action) {
         case 'add':
             $skill->name = $data->name;
-            $skill->proficiency = $data->proficiency;
             $skill->category_id = $data->category_id;
 
             if ($skill->add()) {
@@ -65,7 +63,6 @@ if ($method === 'GET') {
         case 'update':
             $skill->id = $data->id;
             $skill->name = $data->name;
-            $skill->proficiency = $data->proficiency;
             $skill->category_id = $data->category_id;
 
             if ($skill->update()) {
