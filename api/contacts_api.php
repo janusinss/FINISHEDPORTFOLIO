@@ -30,7 +30,7 @@ if ($method === 'POST') {
 
         if ($contact->add()) {
             http_response_code(201); // Created
-            echo json_encode(array('message' => 'Message Sent'));
+            echo json_encode(array('message' => 'Message Saved'));
         } else {
             http_response_code(500);
             echo json_encode(array('message' => 'Message Not Sent. An error occurred.'));

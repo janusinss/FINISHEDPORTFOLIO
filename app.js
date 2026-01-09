@@ -544,6 +544,26 @@ function setupContactForm() {
         body: JSON.stringify(Object.fromEntries(formData)),
       });
       if (res.ok) {
+        // Database save successful, now send to Formspree
+        try {
+          // IMPORTANT: User must replace 'YOUR_FORMSPREE_ID' with their actual Form ID from formspree.io
+          // Example: 'https://formspree.io/f/xpqvjrz'
+          const formspreeId = "xreezznd";
+
+          if (formspreeId !== "YOUR_FORMSPREE_ID") {
+            await fetch(`https://formspree.io/f/${formspreeId}`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(Object.fromEntries(formData)),
+            });
+          }
+        } catch (mailErr) {
+          console.warn(
+            "Formspree email failed, but message saved to DB.",
+            mailErr
+          );
+        }
+
         btn.classList.remove("loading");
         btn.classList.add("success");
         btn.innerText = "TRANSMISSION RECEIVED";
