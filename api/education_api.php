@@ -3,8 +3,8 @@
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
 header('Access-Control-Allow-Methods: GET, POST');
-header('Access-Control-Allow-Headers: Content-Type');
-
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+include_once 'auth.php';
 include_once '../database.php';
 include_once '../Education.php';
 
@@ -39,9 +39,11 @@ if ($method === 'GET') {
         echo json_encode(array());
     }
 } elseif ($method === 'POST') {
+    authenticate();
+    
     $data = json_decode(file_get_contents("php://input"));
 
-    if (!isset($data->action)) {
+    if (!$data || !isset($data->action)) {
         http_response_code(400);
         echo json_encode(array('message' => 'Action parameter is required.'));
         exit;
@@ -110,3 +112,4 @@ if ($method === 'GET') {
     echo json_encode(array('message' => 'Method Not Allowed'));
 }
 ?>
+

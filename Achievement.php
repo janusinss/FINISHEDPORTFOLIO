@@ -76,13 +76,6 @@ class Achievement
 
         $stmt = $this->conn->prepare($query);
 
-        // Clean data
-        $this->title = htmlspecialchars(strip_tags($this->title));
-        $this->category = htmlspecialchars(strip_tags($this->category));
-        $this->description = htmlspecialchars(strip_tags($this->description));
-        $this->date_achieved = htmlspecialchars(strip_tags($this->date_achieved));
-        $this->issuing_organization = htmlspecialchars(strip_tags($this->issuing_organization));
-
         // Bind data
         $stmt->bindParam(':title', $this->title);
         $stmt->bindParam(':category', $this->category);
@@ -97,7 +90,7 @@ class Achievement
             }
             return false;
         } catch (PDOException $e) {
-            printf("Error: %s.\n", $e->getMessage());
+            error_log("Database Error in Achievement::add: " . $e->getMessage());
             return false;
         }
     }
@@ -118,14 +111,7 @@ class Achievement
 
         $stmt = $this->conn->prepare($query);
 
-        // Clean and bind
-        $this->id = htmlspecialchars(strip_tags($this->id));
-        $this->title = htmlspecialchars(strip_tags($this->title));
-        $this->category = htmlspecialchars(strip_tags($this->category));
-        $this->description = htmlspecialchars(strip_tags($this->description));
-        $this->date_achieved = htmlspecialchars(strip_tags($this->date_achieved));
-        $this->issuing_organization = htmlspecialchars(strip_tags($this->issuing_organization));
-
+        // Bind data
         $stmt->bindParam(':id', $this->id);
         $stmt->bindParam(':title', $this->title);
         $stmt->bindParam(':category', $this->category);
@@ -136,7 +122,7 @@ class Achievement
         try {
             return $stmt->execute();
         } catch (PDOException $e) {
-            printf("Error: %s.\n", $e->getMessage());
+            error_log("Database Error in Achievement::update: " . $e->getMessage());
             return false;
         }
     }
@@ -148,13 +134,12 @@ class Achievement
     {
         $query = 'DELETE FROM ' . $this->table . ' WHERE id = :id';
         $stmt = $this->conn->prepare($query);
-        $this->id = htmlspecialchars(strip_tags($this->id));
         $stmt->bindParam(':id', $this->id);
 
         try {
             return $stmt->execute();
         } catch (PDOException $e) {
-            printf("Error: %s.\n", $e->getMessage());
+            error_log("Database Error in Achievement::delete: " . $e->getMessage());
             return false;
         }
     }

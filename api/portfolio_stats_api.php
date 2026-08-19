@@ -141,10 +141,10 @@ if ($method === 'GET') {
         echo json_encode($response, JSON_PRETTY_PRINT);
 
     } catch (PDOException $e) {
+        error_log('Error retrieving statistics: ' . $e->getMessage());
         http_response_code(500);
         echo json_encode(array(
-            'message' => 'Error retrieving statistics',
-            'error' => $e->getMessage()
+            'message' => 'Error retrieving statistics. Please try again later.'
         ));
     }
 } else {

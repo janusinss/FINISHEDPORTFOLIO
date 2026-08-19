@@ -5,6 +5,8 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Methods: GET, POST');
 header('Access-Control-Allow-Headers: Access-Control-Allow-Headers,Content-Type,Access-Control-Allow-Methods, Authorization, X-Requested-With');
 
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+include_once 'auth.php';
 include_once '../database.php';
 include_once '../Profile.php';
 
@@ -68,3 +70,4 @@ if ($method === 'GET') {
     echo json_encode(array('message' => 'Method Not Allowed'));
 }
 ?>
+

@@ -63,7 +63,7 @@ class Skill
             }
             return false;
         } catch (PDOException $e) {
-            printf("Error: %s.\n", $e->getMessage());
+            error_log('Database Error: ' . $e->getMessage());
             return false;
         }
     }
@@ -99,7 +99,7 @@ class Skill
             }
             return false;
         } catch (PDOException $e) {
-            printf("Error: %s.\n", $e->getMessage());
+            error_log('Database Error: ' . $e->getMessage());
             return false;
         }
     }
@@ -124,7 +124,7 @@ class Skill
             }
             return false;
         } catch (PDOException $e) {
-            printf("Error: %s.\n", $e->getMessage());
+            error_log('Database Error: ' . $e->getMessage());
             return false;
         }
     }
