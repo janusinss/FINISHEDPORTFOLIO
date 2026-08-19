@@ -766,3 +766,18 @@ body.loading #cursor {
 .text-btn-text {
   color: var(--accent);
 }
+
+.slashed-btn { position: relative; }
+.slashed-btn::after { 
+  content: ""; 
+  position: absolute; 
+  top: 50%; 
+  left: 50%; 
+  width: 120%; 
+  height: 2px; 
+  background-color: var(--text-secondary); 
+  transform: translate(-50%, -50%) rotate(-45deg); 
+  pointer-events: none; 
+  z-index: 10; 
+  opacity: 0.7; 
+}

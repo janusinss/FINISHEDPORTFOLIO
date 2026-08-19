@@ -1,3 +1,9 @@
 .env
 .DS_Store
 error_log
+.agent/
+.agents/
+.codex
+.impeccable
+product.md
+design.md

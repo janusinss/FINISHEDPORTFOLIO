@@ -119,7 +119,7 @@ class AudioEngine {
     static toggleMute() {
         this.isMuted = !this.isMuted;
         const btn = document.getElementById("mute-btn");
-        if (btn) btn.classList.toggle("muted");
+        if (btn) btn.classList.toggle("slashed-btn", this.isMuted);
     }
 }
 
@@ -152,6 +152,7 @@ class AnimationEngine {
     static initLenis() {
         if (typeof Lenis === "undefined") return;
         this.lenis = new Lenis({ lerp: 0.08, smoothWheel: true });
+
         const content = document.querySelector(".content-wrapper");
         let skew = 0;
 
@@ -550,6 +551,18 @@ class UIManager {
     static initFooterSystem() {
         const footerYear = document.getElementById("footer-year");
         if (footerYear) footerYear.textContent = new Date().getFullYear();
+
+        const uptimeEl = document.getElementById("system-uptime");
+        if (uptimeEl) {
+            const startTime = Date.now();
+            setInterval(() => {
+                const diff = Math.floor((Date.now() - startTime) / 1000);
+                const h = String(Math.floor(diff / 3600)).padStart(2, '0');
+                const m = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
+                const s = String(diff % 60).padStart(2, '0');
+                uptimeEl.textContent = `${h}:${m}:${s}`;
+            }, 1000);
+        }
     }
 }
 
@@ -571,8 +584,9 @@ class AdminController {
     }
 
     static toggleAdminMode(btn) {
-        document.body.classList.toggle("admin-mode");
+        const isActive = document.body.classList.toggle("admin-mode");
         btn.classList.toggle("active");
+        btn.classList.toggle("slashed-btn", !isActive);
         AudioEngine.playClick();
 
         if (document.body.classList.contains("admin-mode")) {
