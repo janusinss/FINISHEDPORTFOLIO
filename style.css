@@ -594,6 +594,16 @@ body.admin-mode .section-controls {
     border-bottom: 1px solid var(--accent);
     padding-left: 0.5rem;
   }
+
+  /* Hide custom cursor on touch devices */
+  #cursor {
+    display: none !important;
+  }
+
+  /* Restore system cursor (otherwise it stays hidden due to global cursor:none) */
+  * {
+    cursor: auto !important;
+  }
 }
 
 /* === DYNAMIC PROGRESS BARS (MOVED TO BOTTOM FOR SAFETY) === */
