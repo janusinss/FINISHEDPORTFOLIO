@@ -7,3 +7,7 @@ error_log
 .impeccable
 product.md
 design.md
+.claude/
+skills-lock.json
+.gitignore
+.env.example

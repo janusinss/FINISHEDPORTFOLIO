@@ -44,7 +44,12 @@ html.lenis {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  cursor: none !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  * {
+    cursor: none !important;
+  }
 }
 
 /* body.custom-cursor-active,
@@ -76,10 +81,10 @@ h1[data-scramble] {
 }
 
 .section-title {
-  font-size: 4rem;
-  line-height: 1;
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  line-height: 1.1;
   font-weight: 700;
-  margin-bottom: 3rem;
+  margin-bottom: clamp(2rem, 5vw, 3rem);
   opacity: 0.15;
   transition: opacity 0.5s;
 }
@@ -199,20 +204,22 @@ textarea:not(:placeholder-shown):invalid {
   position: absolute;
   bottom: -4px;
   left: 0;
-  width: 0;
+  width: 100%;
   height: 1px;
   background: var(--accent);
-  transition: width 0.3s;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
 }
 .nav-item:hover::after {
-  width: 100%;
+  transform: scaleX(1);
 }
 .nav-item.active-link {
   color: var(--accent);
   text-shadow: 0 0 10px var(--accent);
 }
 .nav-item.active-link::after {
-  width: 100%;
+  transform: scaleX(1);
 }
 
 .side-nav {
@@ -284,17 +291,26 @@ textarea:not(:placeholder-shown):invalid {
   left: 0;
   width: 10px;
   height: 10px;
-  background: var(--cursor-color);
-  border-radius: 50%;
   pointer-events: none;
   z-index: 9999;
-  transform: translate(-50%, -50%);
-  transition: width 0.3s, height 0.3s;
+  /* Position is set by app.js (e.g. translate3d) */
   mix-blend-mode: difference;
 }
-#cursor.hovered {
-  width: 60px;
-  height: 60px;
+#cursor::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--cursor-color);
+  border-radius: 50%;
+  transform: scale(1);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  opacity: 1;
+}
+#cursor.hovered::after {
+  transform: scale(6);
   opacity: 0.2;
 }
 
@@ -589,27 +605,39 @@ body.admin-mode .section-controls {
     padding: 0.5rem 1.5rem;
     border-radius: 50px;
     border: 1px solid var(--border-color);
+    z-index: 100; /* Ensure it stays above other fixed elements */
   }
   .theme-toggle {
     writing-mode: horizontal-tb;
     border-left: none;
-    padding: 0.5rem;
-    font-size: 0.6rem;
+    padding: 0.75rem 1rem; /* Larger touch targets */
+    font-size: 0.75rem;
   }
   .theme-toggle.active {
     border-left: none;
-    border-bottom: 1px solid var(--accent);
-    padding-left: 0.5rem;
+    border-bottom: 2px solid var(--accent);
+    padding-left: 0.75rem; /* Reset padding to match inactive */
+  }
+
+  /* Adjust fixed buttons to avoid overlap with side nav */
+  #admin-btn {
+    bottom: auto;
+    top: 1rem;
+    left: 1rem;
+    width: 44px;
+    height: 44px;
+  }
+  #mute-btn {
+    bottom: auto;
+    top: 1rem;
+    right: 1rem;
+    width: 44px;
+    height: 44px;
   }
 
   /* Hide custom cursor on touch devices */
   #cursor {
     display: none !important;
-  }
-
-  /* Restore system cursor (otherwise it stays hidden due to global cursor:none) */
-  * {
-    cursor: auto !important;
   }
 }
 
