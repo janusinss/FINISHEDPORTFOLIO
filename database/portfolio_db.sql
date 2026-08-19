@@ -372,10 +372,10 @@ VALUES (
         'FreeCodeCamp'
     ),
     (
-        'Software Engineering 1',
+        'Research Ethics Office',
         'competition',
-        '1st Place in 48-hour hackathon for developing a smart parking solution using IoT and web technologies.',
-        '2023-03-15',
+        'Research Ethics Office was built. This system was built to help the Research Ethics Office with their daily tasks.',
+        '2025-09-15',
         'Western Mindanao State University'
     ),
     (

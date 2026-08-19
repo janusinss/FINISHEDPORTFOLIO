@@ -175,6 +175,21 @@ textarea:focus {
   border-color: var(--accent);
 }
 
+/* Hardened Form Validation States */
+input:not(:placeholder-shown):valid,
+textarea:not(:placeholder-shown):valid {
+  border-color: #22c55e;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+  transition: all 0.3s ease;
+}
+
+input:not(:placeholder-shown):invalid,
+textarea:not(:placeholder-shown):invalid {
+  border-color: #ef4444;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+  transition: all 0.3s ease;
+}
+
 /* === NAV & SIDEBAR === */
 .nav-item {
   position: relative;
@@ -334,15 +349,7 @@ html {
 #delete-modal {
   display: none;
 }
-#delete-modal.active {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-#delete-modal.active .modal-content {
-  transform: scale(1);
-  opacity: 1;
-}
+
 
 .reveal-text {
   overflow: hidden;
@@ -740,13 +747,7 @@ body.loading #cursor {
 #edit-modal {
   display: none; /* Controlled by JS flex/none */
 }
-#edit-modal.active {
-  display: flex;
-}
-#edit-modal.active .modal-content {
-  transform: scale(1);
-  opacity: 1;
-}
+
 
 /* Modal Inputs Overlay Styles */
 #edit-form input,
@@ -781,3 +782,22 @@ body.loading #cursor {
   z-index: 10; 
   opacity: 0.7; 
 }
+
+/* === OVERDRIVE === */
+.project-card, .info-card, .skill-tag {
+  will-change: transform, filter; /* Opt for hardware acceleration on overdrive target */
+}
+
+.is-tearing {
+  filter: url('#crt-tear');
+  position: relative;
+  z-index: 50; /* Bring torn element to top to avoid clipping */
+}
+
+/* === VIEW TRANSITIONS OVERDRIVE === */
+::view-transition-group(modal-morph) {
+  animation-duration: 0.5s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); /* expo.out equivalent */
+}
+
+

@@ -30,6 +30,17 @@
 </head>
 
 <body>
+    <!-- SVG Distortion Filter -->
+    <svg style="display: none;">
+        <defs>
+            <filter id="crt-tear" x="-20%" y="-20%" width="140%" height="140%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.001 0.15" numOctaves="1" result="noise" />
+                <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 15 -7" in="noise" result="coloredNoise" />
+                <feDisplacementMap id="tear-displacement" in="SourceGraphic" in2="coloredNoise" scale="0" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+        </defs>
+    </svg>
+
     <div class="fixed top-0 left-0 h-[4px] z-[9002] transition-all duration-100 ease-out" id="scroll-progress"
         style="width: 0%"></div>
 
@@ -58,13 +69,13 @@
     <div id="cursor"></div>
 
     <div class="side-nav">
-        <button id="theme-dark" onclick="setTheme('dark')" class="theme-toggle">DARK</button>
-        <button id="theme-light" onclick="setTheme('light')" class="theme-toggle active">WARM</button>
+        <button id="theme-dark" onclick="setTheme('dark')" class="theme-toggle" aria-label="Switch to Dark Theme">DARK</button>
+        <button id="theme-light" onclick="setTheme('light')" class="theme-toggle active" aria-label="Switch to Warm Theme">WARM</button>
     </div>
 
-    <button id="admin-btn" class="slashed-btn">ADMIN</button>
+    <button id="admin-btn" class="slashed-btn" aria-label="Toggle Admin Mode">ADMIN</button>
 
-    <button id="mute-btn" onclick="toggleMute()">SND</button>
+    <button id="mute-btn" onclick="toggleMute()" aria-label="Toggle Sound">SND</button>
 
     <div class="content-wrapper">
         <header class="px-6 lg:px-16 py-8 lg:py-12 min-h-screen flex flex-col justify-center relative z-10">
@@ -102,7 +113,7 @@
                     <div class="flex items-center justify-between mb-12">
                         <h2 class="section-title mb-0">Selected Works</h2>
                         <div class="section-controls">
-                            <button class="admin-action-btn edit-btn" onclick="openAddModal('project')">+ ADD
+                            <button class="admin-action-btn edit-btn" onclick="openAddModal('project', event)">+ ADD
                                 PROJECT</button>
                         </div>
                     </div>
@@ -113,7 +124,7 @@
                     <div class="flex items-center justify-between mb-12">
                         <h2 class="section-title mb-0">Technical Arsenal</h2>
                         <div class="section-controls">
-                            <button class="admin-action-btn edit-btn" onclick="openAddModal('skill')">+ ADD
+                            <button class="admin-action-btn edit-btn" onclick="openAddModal('skill', event)">+ ADD
                                 SKILL</button>
                         </div>
                     </div>
@@ -124,7 +135,7 @@
                     <div class="flex items-center justify-between mb-12">
                         <h2 class="section-title mb-0">Interests & Hobbies</h2>
                         <div class="section-controls">
-                            <button class="admin-action-btn edit-btn" onclick="openAddModal('hobby')">+ ADD
+                            <button class="admin-action-btn edit-btn" onclick="openAddModal('hobby', event)">+ ADD
                                 HOBBY</button>
                         </div>
                     </div>
@@ -152,7 +163,7 @@
                                     </h3>
                                     <div class="section-controls">
                                         <button class="admin-action-btn edit-btn text-[10px]"
-                                            onclick="openAddModal('education')">+ ADD</button>
+                                            onclick="openAddModal('education', event)">+ ADD</button>
                                     </div>
                                 </div>
                                 <div id="education-list" class="space-y-6"></div>
@@ -165,7 +176,7 @@
                                         Certifications</h3>
                                     <div class="section-controls">
                                         <button class="admin-action-btn edit-btn text-[10px]"
-                                            onclick="openAddModal('certification')">+ ADD</button>
+                                            onclick="openAddModal('certification', event)">+ ADD</button>
                                     </div>
                                 </div>
                                 <div id="certifications-list" class="space-y-6"></div>
@@ -176,7 +187,7 @@
                                     </h3>
                                     <div class="section-controls">
                                         <button class="admin-action-btn edit-btn text-[10px]"
-                                            onclick="openAddModal('achievement')">+ ADD</button>
+                                            onclick="openAddModal('achievement', event)">+ ADD</button>
                                     </div>
                                 </div>
                                 <div id="achievements-list" class="space-y-6"></div>
@@ -219,7 +230,7 @@
                         DOMINIC</span></div>
                 <div class="flex items-center gap-6">
                     <div class="flex items-center"><span class="status-dot"></span><span>SYSTEM ONLINE</span></div>
-                    <div class="hidden md:block">UPTIME: <span id="system-uptime" class="text-accent">00:00:00</span>
+                    <div class="hidden md:block">UPTIME: <span id="system-uptime" class="text-accent">00:00:00</span><span class="blink ml-1 text-accent">█</span>
                     </div>
                     <div>LOC: <span class="text-accent">PHILIPPINES</span></div>
                 </div>
@@ -384,6 +395,15 @@
             let targetVel = 0;
             let currentVel = 0;
 
+            // PLANET INTERACTION STATE
+            const raycaster = new THREE.Raycaster();
+            const mouseVec = new THREE.Vector2();
+            let isDraggingPlanet = false;
+            let previousMousePosition = { x: 0, y: 0 };
+            let dragVelocity = { x: 0, y: 0 };
+            let dragRotation = { x: 0, y: 0 };
+            let planetClickEffect = 0;
+
             function animate() {
                 requestAnimationFrame(animate);
                 mouseX += (targetX - mouseX) * 0.05; mouseY += (targetY - mouseY) * 0.05;
@@ -399,17 +419,84 @@
 
                 if (heroGroup) {
                     const t = material.uniforms.u_time.value;
-                    heroGroup.children[0].rotation.y = t * 0.05; heroGroup.children[0].rotation.z = Math.sin(t * 0.5) * 0.05;
-                    heroGroup.children[1].children[0].rotation.z = t * 0.1;
-                    heroGroup.children[1].children[1].rotation.z = t * -0.02;
-                    heroGroup.children[1].children[2].rotation.z = t * 0.05;
-                    heroGroup.position.y += Math.sin(t) * 0.002;
+                    let audioIntensity = 0;
+                    if (typeof AudioEngine !== 'undefined') {
+                        audioIntensity = AudioEngine.getFrequencyData() / 255.0;
+                    }
+
+                    // Apply Drag Inertia
+                    dragRotation.x += dragVelocity.x;
+                    dragRotation.y += dragVelocity.y;
+                    dragVelocity.x *= 0.92; // Damping
+                    dragVelocity.y *= 0.92; // Damping
+                    planetClickEffect *= 0.9; // Glitch decay
+
+                    const tiltX = (mouseY - 0.5) * 1.5;
+                    const tiltY = (mouseX - 0.5) * 1.5;
+                    const jitter = audioIntensity * 0.3 + planetClickEffect * 0.5;
+
+                    // Planet Spin, Tilt, Drag & Glow
+                    heroGroup.children[0].rotation.y = t * 0.05 + tiltY + dragRotation.x; 
+                    heroGroup.children[0].rotation.x = tiltX + dragRotation.y;
+                    heroGroup.children[0].rotation.z = Math.sin(t * 0.5) * 0.05;
+                    heroGroup.children[0].position.set((Math.random() - 0.5)*jitter, (Math.random() - 0.5)*jitter, (Math.random() - 0.5)*jitter);
+                    
+                    if (heroMaterials.planet.emissiveIntensity !== undefined) {
+                         const baseE = isDark ? 0.2 : 0.5;
+                         heroMaterials.planet.emissiveIntensity = baseE + audioIntensity * 2.0 + planetClickEffect * 3.0;
+                    }
+
+                    // Wireframe Rings Spin & Glitch
+                    heroGroup.children[1].position.set((Math.random() - 0.5)*jitter, (Math.random() - 0.5)*jitter, (Math.random() - 0.5)*jitter);
+                    heroGroup.children[1].children[0].rotation.z = t * 0.1 + audioIntensity * 1.5 + planetClickEffect * 2.0;
+                    
+                    // Particle Ring Expansion
+                    heroGroup.children[1].children[1].rotation.z = t * -0.02 - audioIntensity;
+                    const pScale = 1 + audioIntensity * 0.8 + planetClickEffect * 1.5;
+                    heroGroup.children[1].children[1].scale.lerp(new THREE.Vector3(pScale, pScale, pScale), 0.15);
+                    
+                    heroGroup.children[1].children[2].rotation.z = t * 0.05 + audioIntensity * 1.2;
                 }
                 renderer.render(scene, camera);
             }
             animate();
 
-            document.addEventListener('mousemove', e => { targetX = e.clientX / window.innerWidth; targetY = 1.0 - (e.clientY / window.innerHeight); });
+            // INTERACTION LISTENERS
+            window.addEventListener('mousedown', (e) => {
+                mouseVec.x = (e.clientX / window.innerWidth) * 2 - 1;
+                mouseVec.y = -(e.clientY / window.innerHeight) * 2 + 1;
+                raycaster.setFromCamera(mouseVec, camera);
+
+                if (heroGroup && heroGroup.children[0]) {
+                    const intersects = raycaster.intersectObject(heroGroup.children[0]);
+                    if (intersects.length > 0) {
+                        isDraggingPlanet = true;
+                        previousMousePosition = { x: e.clientX, y: e.clientY };
+                        dragVelocity = { x: 0, y: 0 };
+                        
+                        // Click Effect
+                        planetClickEffect = 1.0;
+                        if (typeof AudioEngine !== 'undefined') AudioEngine.playGlitch();
+                    }
+                }
+            });
+
+            window.addEventListener('mouseup', () => {
+                isDraggingPlanet = false;
+            });
+
+            document.addEventListener('mousemove', e => { 
+                targetX = e.clientX / window.innerWidth; 
+                targetY = 1.0 - (e.clientY / window.innerHeight); 
+                
+                if (isDraggingPlanet) {
+                    const deltaX = e.clientX - previousMousePosition.x;
+                    const deltaY = e.clientY - previousMousePosition.y;
+                    dragVelocity.x = deltaX * 0.005;
+                    dragVelocity.y = deltaY * 0.005;
+                    previousMousePosition = { x: e.clientX, y: e.clientY };
+                }
+            });
 
             // SCROLL LISTENER
             window.addEventListener('scroll', () => {

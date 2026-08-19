@@ -72,12 +72,29 @@ class AudioEngine {
     static masterGain = null;
     static isMuted = false;
 
+    static analyser = null;
+    static freqData = null;
+
     static init() {
         window.AudioContext = window.AudioContext || window.webkitAudioContext;
         this.ctx = new AudioContext();
         this.masterGain = this.ctx.createGain();
         this.masterGain.gain.value = 0.1;
-        this.masterGain.connect(this.ctx.destination);
+        
+        this.analyser = this.ctx.createAnalyser();
+        this.analyser.fftSize = 64; 
+        this.freqData = new Uint8Array(this.analyser.frequencyBinCount);
+        
+        this.masterGain.connect(this.analyser);
+        this.analyser.connect(this.ctx.destination);
+    }
+    
+    static getFrequencyData() {
+        if (!this.analyser) return 0;
+        this.analyser.getByteFrequencyData(this.freqData);
+        let sum = 0;
+        for(let i = 0; i < this.freqData.length; i++) sum += this.freqData[i];
+        return sum / this.freqData.length; 
     }
 
     static playTone(freq, type = 'sine', duration = 0.05, maxGain = 0.5) {
@@ -137,6 +154,7 @@ class AnimationEngine {
         this.simulateLoading();
         this.initCustomCursor();
         this.initSmoothNav();
+        this.initHolographicSpotlight();
         
         try {
             if (!this.prefersReducedMotion) {
@@ -202,6 +220,18 @@ class AnimationEngine {
         });
     }
 
+    static initHolographicSpotlight() {
+        document.body.addEventListener("mousemove", (e) => {
+            document.querySelectorAll('.project-card, .info-card, .skill-tag').forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    }
+
     static initCustomCursor() {
         if (this.prefersReducedMotion) return;
         const cursor = document.getElementById("cursor");
@@ -263,16 +293,42 @@ class AnimationEngine {
     static initTilt(element) {
         if (AnimationEngine.prefersReducedMotion) return;
         const image = element.querySelector("img");
+        
+        let lastX = 0;
+        let lastY = 0;
+        let velocity = 0;
+        
+        gsap.set(element, { transformPerspective: 1000, transformOrigin: "center center" });
+        
         element.addEventListener("mousemove", (e) => {
             const rect = element.getBoundingClientRect();
             const xPct = (e.clientX - rect.left) / rect.width - 0.5;
             const yPct = (e.clientY - rect.top) / rect.height - 0.5;
-            gsap.to(element, { transform: `perspective(1000px) rotateX(${yPct * -10}deg) rotateY(${xPct * 10}deg) scale(1.02)`, duration: 0.1 });
-            if (image) gsap.to(image, { x: xPct * -20, y: yPct * -20, scale: 1.1, duration: 0.1 });
+            
+            const dx = e.clientX - lastX;
+            const dy = e.clientY - lastY;
+            velocity = Math.sqrt(dx*dx + dy*dy);
+            lastX = e.clientX;
+            lastY = e.clientY;
+
+            if (velocity > 40) {
+                element.classList.add('is-tearing');
+                const tearDisplacement = document.getElementById('tear-displacement');
+                if (tearDisplacement) tearDisplacement.setAttribute('scale', Math.min(velocity, 80).toString());
+                
+                gsap.to(element, { rotationX: yPct * -30, rotationY: xPct * 30, scale: 1.05, duration: 0.2, ease: "power4.out" });
+                if (image) gsap.to(image, { x: xPct * -40, y: yPct * -40, scale: 1.15, duration: 0.2, ease: "power4.out" });
+            } else {
+                element.classList.remove('is-tearing');
+                gsap.to(element, { rotationX: yPct * -10, rotationY: xPct * 10, scale: 1.02, duration: 0.1 });
+                if (image) gsap.to(image, { x: xPct * -20, y: yPct * -20, scale: 1.1, duration: 0.1 });
+            }
         });
+        
         element.addEventListener("mouseleave", () => {
-            gsap.to(element, { transform: `perspective(1000px) rotateX(0) rotateY(0) scale(1)`, duration: 0.6, ease: "elastic.out(1, 0.6)" });
-            if (image) gsap.to(image, { x: 0, y: 0, scale: 1, duration: 0.6, ease: "power2.out" });
+            element.classList.remove('is-tearing');
+            gsap.to(element, { rotationX: 0, rotationY: 0, scale: 1, duration: 1.2, ease: "elastic.out(1.2, 0.3)" });
+            if (image) gsap.to(image, { x: 0, y: 0, scale: 1, duration: 0.8, ease: "power2.out" });
         });
     }
 
@@ -381,8 +437,8 @@ class UIManager {
         grid.innerHTML = data.map(p => `
             <div class="project-card p-8 opacity-0 translate-y-8 group relative flex flex-col h-full">
                 <div class="admin-controls">
-                    <button class="admin-action-btn edit-btn" onclick="AdminController.openEditModal('project', ${p.id})">EDIT</button>
-                    <button class="admin-action-btn del-btn" onclick="AdminController.deleteItem('project', ${p.id})">DEL</button>
+                    <button class="admin-action-btn edit-btn" onclick="AdminController.openEditModal('project', ${p.id}, event)">EDIT</button>
+                    <button class="admin-action-btn del-btn" onclick="AdminController.deleteItem('project', ${p.id}, event)">DEL</button>
                 </div>
                 <div class="mb-6 border-b border-gray-500/20 pb-6">
                      <h3 class="text-3xl font-bold mb-2">${Utils.escapeHTML(p.title)}</h3>
@@ -403,13 +459,14 @@ class UIManager {
         container.innerHTML = data.map(s => `
             <div class="skill-tag px-4 py-3 opacity-0 translate-y-4 text-xs font-mono border border-gray-500/30 transition-colors cursor-default relative overflow-hidden">
                 <div class="admin-controls">
-                    <button class="admin-action-btn edit-btn text-[0.5rem] px-1.5 py-0.5 h-auto min-h-0" onclick="AdminController.openEditModal('skill', ${s.id})">EDIT</button>
-                    <button class="admin-action-btn del-btn text-[0.5rem] px-1.5 py-0.5 h-auto min-h-0" onclick="AdminController.deleteItem('skill', ${s.id})">DEL</button>
+                    <button class="admin-action-btn edit-btn text-[0.5rem] px-1.5 py-0.5 h-auto min-h-0" onclick="AdminController.openEditModal('skill', ${s.id}, event)">EDIT</button>
+                    <button class="admin-action-btn del-btn text-[0.5rem] px-1.5 py-0.5 h-auto min-h-0" onclick="AdminController.deleteItem('skill', ${s.id}, event)">DEL</button>
                 </div>
                 ${Utils.escapeHTML(s.name)}
             </div>
         `).join("");
         AnimationEngine.animateItems(".skill-tag");
+        setTimeout(() => document.querySelectorAll(".skill-tag").forEach(el => AnimationEngine.initTilt(el)), 500);
     }
 
     static renderExperience(data) {
@@ -418,8 +475,8 @@ class UIManager {
         container.innerHTML = data.map(exp => `
             <div class="info-card p-6 opacity-0 translate-y-8 border-l-2 border-transparent transition-all relative">
                 <div class="admin-controls">
-                    <button class="admin-action-btn edit-btn" onclick="AdminController.openEditModal('experience', ${exp.id})">EDIT</button>
-                    <button class="admin-action-btn del-btn" onclick="AdminController.deleteItem('experience', ${exp.id})">DEL</button>
+                    <button class="admin-action-btn edit-btn" onclick="AdminController.openEditModal('experience', ${exp.id}, event)">EDIT</button>
+                    <button class="admin-action-btn del-btn" onclick="AdminController.deleteItem('experience', ${exp.id}, event)">DEL</button>
                 </div>
                 <h4 class="font-bold text-lg">${Utils.escapeHTML(exp.position)}</h4>
                 <p class="text-sm font-mono mb-4 text-secondary">${Utils.escapeHTML(exp.company)}</p>
@@ -427,6 +484,7 @@ class UIManager {
             </div>
         `).join("");
         AnimationEngine.animateItems("#experience-list > div");
+        setTimeout(() => document.querySelectorAll("#experience-list > div").forEach(el => AnimationEngine.initTilt(el)), 500);
     }
 
     static renderSimpleCard(type, data, containerId) {
@@ -435,8 +493,8 @@ class UIManager {
         container.innerHTML = data.map(item => `
             <div class="info-card p-6 opacity-0 translate-y-8 relative">
                 <div class="admin-controls">
-                    <button class="admin-action-btn edit-btn" onclick="AdminController.openEditModal('${type}', ${item.id})">EDIT</button>
-                    <button class="admin-action-btn del-btn" onclick="AdminController.deleteItem('${type}', ${item.id})">DEL</button>
+                    <button class="admin-action-btn edit-btn" onclick="AdminController.openEditModal('${type}', ${item.id}, event)">EDIT</button>
+                    <button class="admin-action-btn del-btn" onclick="AdminController.deleteItem('${type}', ${item.id}, event)">DEL</button>
                 </div>
                 <h4 class="font-bold text-lg mb-1">${Utils.escapeHTML(item.degree || item.title || item.name)}</h4>
                 <p class="text-sm font-mono text-accent">${Utils.escapeHTML(item.institution || item.issuing_organization || '')}</p>
@@ -444,6 +502,7 @@ class UIManager {
             </div>
         `).join("");
         AnimationEngine.animateItems(`#${containerId} > div`);
+        setTimeout(() => document.querySelectorAll(`#${containerId} > div`).forEach(el => AnimationEngine.initTilt(el)), 500);
     }
 
     static setupContactForm() {
@@ -534,17 +593,26 @@ class UIManager {
     }
 
     static initScrollSpy() {
-        ["projects", "skills", "info", "contact"].forEach(id => {
-            ScrollTrigger.create({
-                trigger: `#${id}`, start: "top center", end: "bottom center",
-                onToggle: (self) => {
-                    if (self.isActive) {
-                        document.querySelectorAll(".nav-item").forEach(l => l.classList.remove("active-link"));
-                        const link = document.querySelector(`a[href="#${id}"]`);
-                        if (link) link.classList.add("active-link");
-                    }
+        const observerOptions = {
+            root: null,
+            rootMargin: "-20% 0px -70% 0px", // Trigger when section hits upper third of screen
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute("id");
+                    document.querySelectorAll(".nav-item").forEach(l => l.classList.remove("active-link"));
+                    const link = document.querySelector(`a[href="#${id}"]`);
+                    if (link) link.classList.add("active-link");
                 }
             });
+        }, observerOptions);
+
+        ["projects", "skills", "info", "contact"].forEach(id => {
+            const section = document.getElementById(id);
+            if (section) observer.observe(section);
         });
     }
 
@@ -578,9 +646,20 @@ class AdminController {
         if (form) form.addEventListener("submit", (e) => this.handleEditSubmit(e));
         
         // Expose openAddModal globally for HTML inline onclick
-        window.openAddModal = (type) => this.openAddModal(type);
+        window.openAddModal = (type, e) => this.openAddModal(type, e);
         
         this.setupDeleteModal();
+
+        // Close modals on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const editModal = document.getElementById("edit-modal");
+                if (editModal && editModal.style.display === 'flex') this.closeEditModal();
+                
+                const deleteModal = document.getElementById("delete-modal");
+                if (deleteModal && deleteModal.style.display === 'flex') this.closeDeleteModal();
+            }
+        });
     }
 
     static toggleAdminMode(btn) {
@@ -618,8 +697,80 @@ class AdminController {
         };
     }
 
-    static openEditModal(type, id) {
+    static showModalWithGSAP(modalId, triggerElement) {
+        const modal = document.getElementById(modalId);
+        const content = modal.querySelector('.modal-content');
+        
+        const showContent = () => {
+            modal.style.display = 'flex';
+            gsap.killTweensOf([modal, content]);
+            gsap.fromTo(modal, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" });
+            gsap.fromTo(content,
+                { scale: 0.9, opacity: 0, y: 20 },
+                { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: "expo.out", delay: 0.05 }
+            );
+        };
+
+        if (document.startViewTransition && triggerElement) {
+            triggerElement.style.viewTransitionName = 'modal-morph';
+            content.style.viewTransitionName = 'modal-morph';
+            
+            const transition = document.startViewTransition(() => {
+                modal.style.display = 'flex';
+            });
+            
+            transition.finished.finally(() => {
+                triggerElement.style.viewTransitionName = '';
+                content.style.viewTransitionName = '';
+                // Keep track of the active trigger element for hiding later
+                modal.dataset.triggerId = triggerElement.id || ''; 
+                if (!triggerElement.id) {
+                    triggerElement.id = 'temp-trigger-' + Date.now();
+                    modal.dataset.triggerId = triggerElement.id;
+                }
+            });
+        } else {
+            showContent();
+        }
+    }
+
+    static hideModalWithGSAP(modalId) {
+        const modal = document.getElementById(modalId);
+        const content = modal.querySelector('.modal-content');
+        
+        const hideContent = () => {
+            gsap.killTweensOf([modal, content]);
+            gsap.to(content, { scale: 0.95, opacity: 0, y: -10, duration: 0.2, ease: "power2.in" });
+            gsap.to(modal, {
+                opacity: 0, duration: 0.3, ease: "power2.in", delay: 0.1,
+                onComplete: () => { modal.style.display = 'none'; }
+            });
+        };
+
+        if (document.startViewTransition && modal.dataset.triggerId) {
+            const triggerElement = document.getElementById(modal.dataset.triggerId);
+            if (triggerElement) {
+                triggerElement.style.viewTransitionName = 'modal-morph';
+                content.style.viewTransitionName = 'modal-morph';
+                
+                const transition = document.startViewTransition(() => {
+                    modal.style.display = 'none';
+                });
+                
+                transition.finished.finally(() => {
+                    triggerElement.style.viewTransitionName = '';
+                    content.style.viewTransitionName = '';
+                    modal.dataset.triggerId = '';
+                });
+                return;
+            }
+        }
+        hideContent();
+    }
+
+    static openEditModal(type, id, e) {
         const modal = document.getElementById("edit-modal");
+        const trigger = e ? e.currentTarget : null;
         let item = null;
         
         if (type === "project") item = App.state.projects.find(i => i.id == id);
@@ -635,17 +786,18 @@ class AdminController {
         document.getElementById("edit-desc").value = item.description || "";
         
         this.toggleModalFields(type);
-        modal.classList.add("active");
+        this.showModalWithGSAP("edit-modal", trigger);
     }
 
-    static openAddModal(type) {
+    static openAddModal(type, e) {
         const modal = document.getElementById("edit-modal");
+        const trigger = e ? e.currentTarget : null;
         document.getElementById("edit-form").reset();
         document.getElementById("edit-id").value = ""; 
         document.getElementById("edit-type").value = type;
         
         this.toggleModalFields(type);
-        modal.classList.add("active");
+        this.showModalWithGSAP("edit-modal", trigger);
     }
 
     static toggleModalFields(type) {
@@ -668,7 +820,7 @@ class AdminController {
     }
 
     static closeEditModal() {
-        document.getElementById("edit-modal").classList.remove("active");
+        this.hideModalWithGSAP("edit-modal");
     }
 
     static async handleEditSubmit(e) {
@@ -723,18 +875,19 @@ class AdminController {
         }
     }
 
-    static deleteItem(type, id) {
+    static deleteItem(type, id, e) {
         const modal = document.getElementById("delete-modal");
+        const trigger = e ? e.currentTarget : null;
         const messageEl = document.getElementById("delete-message");
         if (messageEl) {
             messageEl.innerHTML = `Are you sure you want to delete this ${type}? <br><span class="text-[#ef4444] font-bold mt-4 block uppercase tracking-widest text-xs border border-[#ef4444] p-2 inline-block bg-[rgba(239,68,68,0.1)]">⚠ This action cannot be undone.</span>`;
         }
         this.deleteConfirmCallback = () => this.performDelete(type, id);
-        modal.classList.add("active");
+        this.showModalWithGSAP("delete-modal", trigger);
     }
 
     static closeDeleteModal() {
-        document.getElementById("delete-modal").classList.remove("active");
+        this.hideModalWithGSAP("delete-modal");
         this.deleteConfirmCallback = null;
     }
 
@@ -763,6 +916,7 @@ class App {
     };
 
     static init() {
+        AudioEngine.init();
         AnimationEngine.init();
         UIManager.init();
         AdminController.init();
