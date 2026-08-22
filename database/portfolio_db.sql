@@ -127,7 +127,7 @@ VALUES (
         TRUE
     ),
     (
-        'quicknote.ct.ws || QuickNote',
+        'QuickNote',
         'A simple web utility designed for fast, frictionless text capture. It lets you open a page, type your thoughts immediately, and keep quick reference notes accessible across your devices.',
         'https://janus-grocery.ct.ws/',
         'https://github.com/janusinss/freshcart',
