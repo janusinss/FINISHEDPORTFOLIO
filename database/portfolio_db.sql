@@ -129,7 +129,7 @@ VALUES (
     (
         'QuickNote',
         'A simple web utility designed for fast, frictionless text capture. It lets you open a page, type your thoughts immediately, and keep quick reference notes accessible across your devices.',
-        'https://janus-grocery.ct.ws/',
+        'https://quicknote.ct.ws/',
         'https://github.com/janusinss/freshcart',
         'https://placehold.co/600x400/0891b2/FFF?text=Grocery+App',
         '2024-01-20',
