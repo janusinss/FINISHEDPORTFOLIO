@@ -127,8 +127,8 @@ VALUES (
         TRUE
     ),
     (
-        'FreshCart Grocery Website',
-        'An online market platform named "FreshCart Market" designed to sell organic and fresh groceries. It allows users to browse various categories like fruits, vegetables, and pantry items, add them to a cart, and "checkout." The footer indicates it is a student project by Janus Dominic.',
+        'quicknote.ct.ws || QuickNote',
+        'A simple web utility designed for fast, frictionless text capture. It lets you open a page, type your thoughts immediately, and keep quick reference notes accessible across your devices.',
         'https://janus-grocery.ct.ws/',
         'https://github.com/janusinss/freshcart',
         'https://placehold.co/600x400/0891b2/FFF?text=Grocery+App',
