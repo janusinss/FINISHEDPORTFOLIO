@@ -154,6 +154,22 @@ class Utils {
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
     }
+
+    static sanitizeURL(url) {
+        if (!url || typeof url !== 'string') return '#';
+        const trimmed = url.trim();
+        // Strict allowlist: only http, https, mailto, tel, or hash anchors to block javascript: URI XSS
+        if (/^(https?:\/\/|mailto:|tel:|#)/i.test(trimmed)) {
+            return Utils.escapeHTML(trimmed);
+        }
+        return '#';
+    }
+
+    static isValidEmail(email) {
+        if (!email || typeof email !== 'string') return false;
+        // ReDoS-safe RFC 5322 standard email validation regex
+        return /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/.test(email.trim());
+    }
 }
 
 
@@ -533,8 +549,8 @@ class UIManager {
                 </div>
                 <p class="text-sm text-secondary mb-8 leading-relaxed flex-grow">${Utils.escapeHTML(p.description)}</p>
                 <div class="flex justify-between items-center text-xs font-mono tracking-widest mt-auto">
-                    <a href="${Utils.escapeHTML(p.project_url)}" target="_blank" rel="noopener noreferrer" class="hover:text-accent">[ VIEW PROJECT ]</a>
-                    ${p.repo_url && p.repo_url !== '#' ? `<a href="${Utils.escapeHTML(p.repo_url)}" target="_blank" rel="noopener noreferrer" class="text-secondary/60 hover:text-accent">[ REPO ]</a>` : ''}
+                    <a href="${Utils.sanitizeURL(p.project_url)}" target="_blank" rel="noopener noreferrer" class="hover:text-accent">[ VIEW PROJECT ]</a>
+                    ${p.repo_url && p.repo_url !== '#' ? `<a href="${Utils.sanitizeURL(p.repo_url)}" target="_blank" rel="noopener noreferrer" class="text-secondary/60 hover:text-accent">[ REPO ]</a>` : ''}
                 </div>
             </div>
         `).join("");
@@ -590,21 +606,71 @@ class UIManager {
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
             const originalText = btn.innerText;
+
+            const formData = Object.fromEntries(new FormData(form));
+
+            // Honeypot bot trap: silent drop if bot fills the hidden _gotcha input
+            if (formData._gotcha && formData._gotcha.trim() !== "") {
+                btn.classList.add("success");
+                btn.innerText = "TRANSMISSION RECEIVED";
+                form.reset();
+                this.showToast("Message transmitted successfully.", "success");
+                setTimeout(() => { btn.classList.remove("success"); btn.innerText = originalText; }, 3000);
+                return;
+            }
+
+            // Anti-Automation / Client-side Rate Limiting (45-second cooldown)
+            const lastSubmission = localStorage.getItem("pf_last_transmission");
+            const now = Date.now();
+            if (lastSubmission && (now - parseInt(lastSubmission, 10)) < 45000) {
+                const waitSec = Math.ceil((45000 - (now - parseInt(lastSubmission, 10))) / 1000);
+                this.showToast(`Rate limit active. Please wait ${waitSec}s before transmitting another message.`, "error");
+                return;
+            }
+
+            // Input boundary validation & sanitization
+            const visitorName = (formData.visitor_name || "").trim().slice(0, 100);
+            const visitorEmail = (formData.visitor_email || "").trim().slice(0, 120);
+            const subject = (formData.subject || "").trim().slice(0, 150);
+            const message = (formData.message || "").trim().slice(0, 2000);
+
+            if (!visitorName || visitorName.length < 2) {
+                this.showToast("Please enter a valid name (at least 2 characters).", "error");
+                return;
+            }
+
+            if (!Utils.isValidEmail(visitorEmail)) {
+                this.showToast("Please enter a valid email address.", "error");
+                return;
+            }
+
+            if (!message || message.length < 5) {
+                this.showToast("Please provide a descriptive message (at least 5 characters).", "error");
+                return;
+            }
+
             btn.classList.add("loading");
             btn.innerText = "TRANSMITTING...";
 
-            const formData = Object.fromEntries(new FormData(form));
+            const payload = {
+                name: visitorName,
+                email: visitorEmail,
+                subject: subject || "Portfolio Contact",
+                message: message
+            };
+
             try {
                 // Direct Formspree submission without PHP/backend requirement
                 const formspreeId = "xreezznd";
                 const response = await fetch(`https://formspree.io/f/${formspreeId}`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json", "Accept": "application/json" },
-                    body: JSON.stringify(formData)
+                    body: JSON.stringify(payload)
                 });
 
                 if (!response.ok) throw new Error("Transmission failed");
 
+                localStorage.setItem("pf_last_transmission", Date.now().toString());
                 btn.classList.remove("loading");
                 btn.classList.add("success");
                 btn.innerText = "TRANSMISSION RECEIVED";
@@ -724,7 +790,7 @@ class App {
             contactInfoEl.innerHTML = `
                 <div class="flex justify-between border-b border-gray-500/30 pb-2"><span>EMAIL</span> <span>${Utils.escapeHTML(profile.email)}</span></div>
                 <div class="flex justify-between border-b border-gray-500/30 pb-2 pt-2"><span>PHONE</span> <span>${Utils.escapeHTML(profile.phone)}</span></div>
-                <div class="pt-4"><a href="${Utils.escapeHTML(profile.facebook_url)}" target="_blank" rel="noopener noreferrer" class="text-accent hover:underline">FACEBOOK LINK_</a></div>
+                <div class="pt-4"><a href="${Utils.sanitizeURL(profile.facebook_url)}" target="_blank" rel="noopener noreferrer" class="text-accent hover:underline">FACEBOOK LINK_</a></div>
             `;
         }
 

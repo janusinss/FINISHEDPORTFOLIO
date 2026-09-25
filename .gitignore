@@ -1,13 +1,34 @@
+# Environment & Secrets
 .env
+.env.*
+*.env
+
+# System & OS
 .DS_Store
+Thumbs.db
+
+# Logs & Debugging
 error_log
+*.log
+
+# Agents & AI Tooling
 .agent/
 .agents/
-.codex
-.impeccable
-product.md
-design.md
+.codex/
+.impeccable/
 .claude/
 skills-lock.json
-.gitignore
-.env.example
+scratch/
+
+# Database & Backups
+*.sql
+*.sqlite
+*.db
+*.bak
+*.swp
+
+# Documentation internal specs
+product.md
+design.md
+PRODUCT.md
+DESIGN.md

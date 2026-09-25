@@ -18,6 +18,11 @@
         content="Interactive 3D portfolio featuring WebGL physics, fluid simulations, and cinematic UI.">
     <meta property="og:image" content="https://your-portfolio-url.com/og-image.jpg">
 
+    <!-- Browser Security Hardening -->
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' https://formspree.io; object-src 'none'; base-uri 'self'; form-action 'self' https://formspree.io;">
+
     <link rel="icon"
         href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 512' fill='%23fbbf24'%3E%3Cpath d='M392.8 1.2c-17-4.9-34.7 5-39.6 22l-128 448c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l128-448c4.9-17-5-34.7-22-39.6zm80.6 120.1c-12.5 12.5-12.5 32.8 0 45.3L562.7 256l-89.4 89.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l112-112c12.5-12.5 12.5-32.8 0-45.3l-112-112c-12.5-12.5-32.8-12.5-45.3 0zm-306.7 0c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3l112 112c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l89.4-89.4c12.5-12.5 12.5-32.8 0-45.3z'/%3E%3C/svg%3E">
 
@@ -171,14 +176,18 @@
                         </div>
                         <form id="contact-form" class="space-y-4">
                             <div id="form-message" class="hidden p-3 text-sm rounded"></div>
+                            <!-- Anti-spam Honeypot (hidden from real users, traps automated bots) -->
+                            <div style="display:none !important;" aria-hidden="true">
+                                <input type="text" name="_gotcha" tabindex="-1" autocomplete="off">
+                            </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <input type="text" name="visitor_name" placeholder="NAME" required
+                                <input type="text" name="visitor_name" placeholder="NAME" required maxlength="100" autocomplete="name"
                                     class="w-full p-4 text-sm">
-                                <input type="email" name="visitor_email" placeholder="EMAIL" required
+                                <input type="email" name="visitor_email" placeholder="EMAIL" required maxlength="120" autocomplete="email"
                                     class="w-full p-4 text-sm">
                             </div>
-                            <input type="text" name="subject" placeholder="SUBJECT" class="w-full p-4 text-sm">
-                            <textarea name="message" rows="4" placeholder="MESSAGE" required
+                            <input type="text" name="subject" placeholder="SUBJECT" maxlength="150" class="w-full p-4 text-sm">
+                            <textarea name="message" rows="4" placeholder="MESSAGE" required maxlength="2000"
                                 class="w-full p-4 text-sm resize-none"></textarea>
                             <button type="submit"
                                 class="btn-minimal w-full py-4 text-xs tracking-[0.2em] uppercase">Transmit</button>
