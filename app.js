@@ -788,8 +788,8 @@ class App {
         const contactInfoEl = document.getElementById("contact-info");
         if (contactInfoEl) {
             contactInfoEl.innerHTML = `
-                <div class="flex justify-between border-b border-gray-500/30 pb-2"><span>EMAIL</span> <span>${Utils.escapeHTML(profile.email)}</span></div>
-                <div class="flex justify-between border-b border-gray-500/30 pb-2 pt-2"><span>PHONE</span> <span>${Utils.escapeHTML(profile.phone)}</span></div>
+                <div class="flex justify-between border-b border-gray-500/30 pb-2"><span>EMAIL</span> <a href="mailto:${Utils.escapeHTML(profile.email)}" class="text-secondary hover:text-accent transition-colors">${Utils.escapeHTML(profile.email)}</a></div>
+                <div class="flex justify-between border-b border-gray-500/30 pb-2 pt-2"><span>PHONE</span> <a href="tel:${Utils.escapeHTML(profile.phone.replace(/\s+/g, ''))}" class="text-secondary hover:text-accent transition-colors">${Utils.escapeHTML(profile.phone)}</a></div>
                 <div class="pt-4"><a href="${Utils.sanitizeURL(profile.facebook_url)}" target="_blank" rel="noopener noreferrer" class="text-accent hover:underline">FACEBOOK LINK_</a></div>
             `;
         }
