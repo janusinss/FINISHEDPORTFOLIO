@@ -1,7 +1,145 @@
 "use strict";
 
-// Register Plugins
-gsap.registerPlugin(ScrollTrigger);
+// Register GSAP Plugins
+if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
+    gsap.registerPlugin(ScrollTrigger);
+}
+
+// ==========================================
+// STATIC PORTFOLIO DATA (ZERO BACKEND / ZERO DB)
+// ==========================================
+const PORTFOLIO_DATA = {
+    profile: {
+        full_name: "Janus Dominic",
+        professional_title: "Full-Stack Developer & Software Engineer",
+        bio: "Passionate developer with expertise in building modern web applications. Specializing in high-performance web applications, interactive 3D interfaces, and seamless digital user experiences.",
+        email: "janusdominic0@gmail.com",
+        phone: "+63 994 873 9200",
+        facebook_url: "https://www.facebook.com/notagirlgamer69",
+        profile_photo_url: "https://i.pravatar.cc/400?img=33"
+    },
+    projects: [
+        {
+            id: 1,
+            title: "SayLess Company Website",
+            description: "A professional website for a tech company called 'SayLess' that specializes in building digital experiences, such as premium websites and applications. It features a portfolio of their work (including a Research Ethics Office portal), a list of team members (with Janus Dominic as Project Manager), and a blog with industry insights.",
+            project_url: "https://sayless.click/",
+            repo_url: "https://github.com/janusinss/sayless"
+        },
+        {
+            id: 2,
+            title: "QuickNote",
+            description: "A simple web utility designed for fast, frictionless text capture. It lets you open a page, type your thoughts immediately, and keep quick reference notes accessible across your devices.",
+            project_url: "https://quicknote.ct.ws/",
+            repo_url: "https://github.com/janusinss/freshcart"
+        },
+        {
+            id: 3,
+            title: "Fitness Gym (Old Project)",
+            description: "A promotional landing page for a local gym ('Fitness Gym'). It outlines the gym's offerings, including basic equipment (cardio, weights), training guides (moderate to expert levels), and opportunities to become a trainer.",
+            project_url: "https://dominic-lab09.netlify.app/#",
+            repo_url: "https://github.com/janusinss/fitness-gym"
+        },
+        {
+            id: 4,
+            title: "BlitzType",
+            description: "A typing game that challenges players to type as fast as possible. It features a leaderboard and a timer to keep track of the player's progress.",
+            project_url: "https://blitztype-5cd8b.web.app/",
+            repo_url: "#"
+        }
+    ],
+    skills: [
+        { id: 1, name: "PHP" },
+        { id: 2, name: "JavaScript" },
+        { id: 3, name: "Python" },
+        { id: 4, name: "HTML5/CSS3" },
+        { id: 5, name: "React" },
+        { id: 6, name: "Tailwind CSS" },
+        { id: 7, name: "MySQL" },
+        { id: 8, name: "PostgreSQL" },
+        { id: 9, name: "Git & GitHub" },
+        { id: 10, name: "VS Code" },
+        { id: 11, name: "Problem Solving" },
+        { id: 12, name: "Team Collaboration" },
+        { id: 13, name: "Full-Stack Developer" },
+        { id: 14, name: "Software Engineer" },
+        { id: 15, name: "TypeScript" },
+        { id: 16, name: "Laravel" },
+        { id: 17, name: "Node.js" },
+        { id: 18, name: "MongoDB" },
+        { id: 19, name: "Docker" },
+        { id: 20, name: "Communication" }
+    ],
+    hobbies: [
+        { id: 1, name: "Gaming", description: "Playing strategy and RPG games" },
+        { id: 2, name: "Creating Websites", description: "Building experimental applications" },
+        { id: 3, name: "Reading Tech Blogs", description: "Staying updated with latest technology trends" },
+        { id: 4, name: "Coding Side Projects", description: "Building experimental applications" },
+        { id: 5, name: "Instrumental Music", description: "Playing the Guitar" }
+    ],
+    experience: [
+        {
+            id: 1,
+            position: "Junior Full-Stack Developer",
+            company: "Western Mindanao State University",
+            description: "Developing and maintaining web applications using PHP, MySQL, and React. Collaborating with cross-functional teams to deliver high-quality software solutions."
+        },
+        {
+            id: 2,
+            position: "Web Development Intern",
+            company: "Western Mindanao State University",
+            description: "Assisted in building responsive websites and learned industry best practices. Worked on 5+ client projects during the internship period."
+        }
+    ],
+    education: [
+        {
+            id: 1,
+            degree: "Bachelor of Science in Computer Science",
+            institution: "Western Mindanao State University",
+            description: "Focused on software engineering, database systems, and web development. Dean's Lister for 4 consecutive semesters."
+        },
+        {
+            id: 2,
+            degree: "High School Diploma",
+            institution: "Zamboanga National High School West",
+            description: "Specialized in Science, Technology, Engineering, and Mathematics (STEM Track)."
+        }
+    ],
+    certifications: [
+        {
+            id: 1,
+            title: "Legacy Responsive Web Design V8",
+            issuing_organization: "FreeCodeCamp",
+            description: "Validates expertise in developing and maintaining web applications"
+        },
+        {
+            id: 2,
+            title: "School Internship",
+            issuing_organization: "Western Mindanao State University",
+            description: "Professional certification for database administration & web development"
+        }
+    ],
+    achievements: [
+        {
+            id: 1,
+            title: "FreeCodeCamp Responsive Web Design",
+            issuing_organization: "FreeCodeCamp",
+            description: "Recognized for outstanding capstone project in Computer Science with innovative approach to solving real-world problems."
+        },
+        {
+            id: 2,
+            title: "Research Ethics Office",
+            issuing_organization: "Western Mindanao State University",
+            description: "Research Ethics Office was built. This system was built to help the Research Ethics Office with their daily tasks."
+        },
+        {
+            id: 3,
+            title: "ACT Internship",
+            issuing_organization: "ACT",
+            description: "Recognized for significant contributions to open-source PHP projects on GitHub."
+        }
+    ]
+};
 
 // ==========================================
 // UTILITIES
@@ -18,171 +156,59 @@ class Utils {
     }
 }
 
-// ==========================================
-// API SERVICE
-// ==========================================
-class ApiService {
-    static BASE_URL = './api';
 
-    static getApiKey() {
-        return sessionStorage.getItem('PORTFOLIO_API_KEY');
-    }
-
-    static async get(endpoint) {
-        try {
-            const res = await fetch(`${this.BASE_URL}/${endpoint}`);
-            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-            return await res.json();
-        } catch (error) {
-            console.error(`API GET Error (${endpoint}):`, error);
-            throw error;
-        }
-    }
-
-    static async post(endpoint, payload) {
-        const headers = { 'Content-Type': 'application/json' };
-        
-        // Contacts API is public, others need Auth
-        if (endpoint !== 'contacts_api.php') {
-            const apiKey = this.getApiKey();
-            if (apiKey) {
-                headers['Authorization'] = `Bearer ${apiKey}`;
-            }
-        }
-
-        const res = await fetch(`${this.BASE_URL}/${endpoint}`, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-        if (!res.ok) {
-            throw { status: res.status, message: data.message || 'Server Error' };
-        }
-        return data;
-    }
-}
-
-// ==========================================
-// AUDIO ENGINE
-// ==========================================
-class AudioEngine {
-    static ctx = null;
-    static masterGain = null;
-    static isMuted = false;
-
-    static analyser = null;
-    static freqData = null;
-
-    static init() {
-        window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        this.ctx = new AudioContext();
-        this.masterGain = this.ctx.createGain();
-        this.masterGain.gain.value = 0.1;
-        
-        this.analyser = this.ctx.createAnalyser();
-        this.analyser.fftSize = 64; 
-        this.freqData = new Uint8Array(this.analyser.frequencyBinCount);
-        
-        this.masterGain.connect(this.analyser);
-        this.analyser.connect(this.ctx.destination);
-    }
-    
-    static getFrequencyData() {
-        if (!this.analyser) return 0;
-        this.analyser.getByteFrequencyData(this.freqData);
-        let sum = 0;
-        for(let i = 0; i < this.freqData.length; i++) sum += this.freqData[i];
-        return sum / this.freqData.length; 
-    }
-
-    static playTone(freq, type = 'sine', duration = 0.05, maxGain = 0.5) {
-        if (!this.ctx || this.isMuted) return;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.connect(gain);
-        gain.connect(this.masterGain);
-        osc.type = type;
-        const now = this.ctx.currentTime;
-        osc.frequency.setValueAtTime(freq, now);
-        osc.frequency.exponentialRampToValueAtTime(freq / 2, now + duration);
-        gain.gain.setValueAtTime(maxGain, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + duration);
-        osc.start(now);
-        osc.stop(now + duration);
-    }
-
-    static playHover() { this.playTone(800, 'sine', 0.05, 0.5); }
-    static playClick() { this.playTone(150, 'triangle', 0.15, 0.8); }
-    static playKeystroke() { this.playTone(600, 'square', 0.03, 0.1); }
-
-    static playGlitch() {
-        if (!this.ctx || this.isMuted) return;
-        const bufferSize = this.ctx.sampleRate * 0.1;
-        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-        const noise = this.ctx.createBufferSource();
-        noise.buffer = buffer;
-        const gain = this.ctx.createGain();
-        noise.connect(gain);
-        gain.connect(this.masterGain);
-        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
-        noise.start();
-    }
-
-    static toggleMute() {
-        this.isMuted = !this.isMuted;
-        const btn = document.getElementById("mute-btn");
-        if (btn) btn.classList.toggle("slashed-btn", this.isMuted);
-    }
-}
 
 // ==========================================
 // ANIMATION ENGINE
 // ==========================================
 class AnimationEngine {
-    static prefersReducedMotion = false; // Override for debugging if needed
     static lenis = null;
 
     static init() {
-        this.prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        this.prefersReducedMotion = false; // FORCE ANIMATION FOR DEBUGGING
-
         this.simulateLoading();
         this.initCustomCursor();
+        this.initLenis();
         this.initSmoothNav();
         this.initHolographicSpotlight();
-        
-        try {
-            if (!this.prefersReducedMotion) {
-                this.initLenis();
-                this.initMagneticButtons();
-            }
-        } catch (err) {
-            console.error("Animation Error:", err);
-            document.body.style.overflow = "auto";
-        }
+        this.initMagneticButtons();
     }
 
     static initLenis() {
-        if (typeof Lenis === "undefined") return;
-        this.lenis = new Lenis({ lerp: 0.08, smoothWheel: true });
+        if (typeof Lenis === "undefined") {
+            console.warn("Lenis library not loaded");
+            return;
+        }
 
-        const content = document.querySelector(".content-wrapper");
-        let skew = 0;
-
-        this.lenis.on("scroll", ({ velocity }) => {
-            ScrollTrigger.update();
-            const targetSkew = velocity * 0.15;
-            skew += (targetSkew - skew) * 0.1;
-            if (content) content.style.transform = `skewY(${skew}deg) translate3d(0,0,0)`;
+        // Initialize Lenis smooth scroll
+        this.lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            orientation: 'vertical',
+            gestureOrientation: 'vertical',
+            smoothWheel: true,
+            wheelMultiplier: 1.0,
+            touchMultiplier: 1.5,
+            infinite: false
         });
 
-        gsap.ticker.add((time) => this.lenis.raf(time * 1000));
-        gsap.ticker.lagSmoothing(0);
+        // Expose globally for Three.js uniform synchronizer
+        window.lenis = this.lenis;
+
+        // Synchronize with GSAP ScrollTrigger
+        if (typeof ScrollTrigger !== "undefined") {
+            this.lenis.on("scroll", () => {
+                ScrollTrigger.update();
+            });
+            ScrollTrigger.refresh();
+        }
+
+        // Bind Lenis RAF directly to GSAP Ticker
+        if (typeof gsap !== "undefined") {
+            gsap.ticker.add((time) => {
+                this.lenis.raf(time * 1000);
+            });
+            gsap.ticker.lagSmoothing(0);
+        }
     }
 
     static initMagneticButtons() {
@@ -207,11 +233,13 @@ class AnimationEngine {
     static initSmoothNav() {
         document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
             anchor.addEventListener("click", (e) => {
-                e.preventDefault();
-                const targetElem = document.querySelector(anchor.getAttribute("href"));
+                const href = anchor.getAttribute("href");
+                if (!href || href === "#") return;
+                const targetElem = document.querySelector(href);
                 if (targetElem) {
+                    e.preventDefault();
                     if (this.lenis) {
-                        this.lenis.scrollTo(targetElem, { duration: 1.5, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+                        this.lenis.scrollTo(targetElem, { offset: -30, duration: 1.2 });
                     } else {
                         targetElem.scrollIntoView({ behavior: "smooth" });
                     }
@@ -233,24 +261,85 @@ class AnimationEngine {
     }
 
     static initCustomCursor() {
-        if (this.prefersReducedMotion) return;
-        const cursor = document.getElementById("cursor");
-        if (!cursor) return;
-        
-        const mouse = { x: -100, y: -100 };
-        const pos = { x: -100, y: -100 };
-        
-        document.addEventListener("mousemove", (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
-        gsap.ticker.add(() => {
-            const dt = 1.0 - Math.pow(0.8, gsap.ticker.deltaRatio());
-            pos.x += (mouse.x - pos.x) * dt;
-            pos.y += (mouse.y - pos.y) * dt;
-            cursor.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) translate(-50%, -50%)`;
+        const dot = document.getElementById("cursor-dot");
+        const ring = document.getElementById("cursor-ring");
+        if (!dot || !ring) return;
+
+        let mouseX = -100;
+        let mouseY = -100;
+        let ringX = -100;
+        let ringY = -100;
+        let hasMoved = false;
+
+        const updateCursorPos = (clientX, clientY) => {
+            mouseX = clientX;
+            mouseY = clientY;
+
+            // Instant pinpoint tracking for center dot (0ms hardware-accelerated transform)
+            dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+
+            if (!hasMoved) {
+                ringX = mouseX;
+                ringY = mouseY;
+                ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
+                hasMoved = true;
+            }
+
+            if (!dot.classList.contains("is-active")) {
+                dot.classList.add("is-active");
+                ring.classList.add("is-active");
+            }
+        };
+
+        const onPointerMove = (e) => {
+            updateCursorPos(e.clientX, e.clientY);
+        };
+
+        window.addEventListener("mousemove", onPointerMove, { passive: true });
+        window.addEventListener("pointermove", onPointerMove, { passive: true });
+
+        // Outer ring smooth follower loop via GSAP ticker
+        if (typeof gsap !== "undefined") {
+            gsap.ticker.add(() => {
+                if (!hasMoved) return;
+                const dt = 1.0 - Math.pow(0.72, gsap.ticker.deltaRatio());
+                ringX += (mouseX - ringX) * dt;
+                ringY += (mouseY - ringY) * dt;
+                ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
+            });
+        }
+
+        // Expand hover aura on interactive elements
+        document.addEventListener("mouseover", (e) => {
+            if (e.target.closest("a, button, input, textarea, .project-card, .skill-tag, .info-card, .btn-minimal, .theme-toggle, .magnetic-wrap, [role='button']")) {
+                dot.classList.add("hovered");
+                ring.classList.add("hovered");
+            } else {
+                dot.classList.remove("hovered");
+                ring.classList.remove("hovered");
+            }
         });
-        
-        document.body.addEventListener("mouseover", (e) => {
-            if (e.target.closest("a, button, input, textarea, .project-card, .magnetic-wrap")) cursor.classList.add("hovered");
-            else cursor.classList.remove("hovered");
+
+        // Click compression feedback
+        window.addEventListener("mousedown", () => {
+            dot.classList.add("clicked");
+            ring.classList.add("clicked");
+        });
+        window.addEventListener("mouseup", () => {
+            dot.classList.remove("clicked");
+            ring.classList.remove("clicked");
+        });
+
+        // Window boundary handling
+        document.addEventListener("mouseleave", () => {
+            dot.classList.remove("is-active");
+            ring.classList.remove("is-active");
+        });
+        document.addEventListener("mouseenter", () => {
+            if (hasMoved) {
+                dot.classList.add("is-active");
+                ring.classList.add("is-active");
+            }
         });
     }
 
@@ -264,29 +353,34 @@ class AnimationEngine {
                 }
             });
 
-            ScrollTrigger.batch(selector, {
-                onEnter: (batch) => {
-                    batch.forEach((el, i) => {
-                        const mask = el.querySelector(".reveal-text");
-                        if (mask) {
-                            setTimeout(() => mask.classList.add("is-visible"), i * 100);
-                        } else {
-                            gsap.to(el, { opacity: 1, y: 0, delay: i * 0.1, duration: 0.8, ease: "power3.out" });
-                        }
+            if (typeof ScrollTrigger !== "undefined") {
+                ScrollTrigger.batch(selector, {
+                    onEnter: (batch) => {
+                        batch.forEach((el, i) => {
+                            const mask = el.querySelector(".reveal-text");
+                            if (mask) {
+                                setTimeout(() => mask.classList.add("is-visible"), i * 100);
+                            } else {
+                                gsap.to(el, { opacity: 1, y: 0, delay: i * 0.1, duration: 0.8, ease: "power3.out" });
+                            }
 
-                        if (el.hasAttribute("data-scramble") || el.querySelector("[data-scramble]")) {
-                            const target = el.hasAttribute("data-scramble") ? el : el.querySelector("[data-scramble]");
-                            UIManager.scrambleText(target);
-                            target.addEventListener("mouseenter", () => {
+                            if (el.hasAttribute("data-scramble") || el.querySelector("[data-scramble]")) {
+                                const target = el.hasAttribute("data-scramble") ? el : el.querySelector("[data-scramble]");
                                 UIManager.scrambleText(target);
-                                AudioEngine.playGlitch();
-                            });
-                        }
-                    });
-                },
-                start: "top 90%",
-                once: true,
-            });
+                                target.addEventListener("mouseenter", () => {
+                                    UIManager.scrambleText(target);
+                                });
+                            }
+                        });
+                    },
+                    start: "top 90%",
+                    once: true,
+                });
+            } else {
+                items.forEach((el, i) => {
+                    gsap.to(el, { opacity: 1, y: 0, delay: i * 0.05, duration: 0.6 });
+                });
+            }
         }, 100);
     }
 
@@ -341,16 +435,16 @@ class AnimationEngine {
         if (!preloader) return;
         document.body.classList.add("loading");
 
-        const bootText = ["INITIALIZING CORE...", "MOUNTING DOM...", "Loading SHADERS...", "SYSTEM READY."];
+        const bootText = ["INITIALIZING CORE...", "MOUNTING DOM...", "LOADING SHADERS...", "SYSTEM READY."];
         let width = 0, logIndex = 0;
 
         const interval = setInterval(() => {
-            width += Math.random() * 5;
+            width += Math.random() * 8 + 4;
             if (width > 100) width = 100;
             if (bar) bar.style.width = width + "%";
 
             if (logs && width > (logIndex + 1) * 25 && logIndex < bootText.length) {
-                logs.innerHTML += `<div><span class="text-accent">>></span> ${bootText[logIndex]}</div>`;
+                logs.innerHTML += `<div><span class="text-accent">&gt;&gt;</span> ${bootText[logIndex]}</div>`;
                 if (logs.children.length > 6) logs.removeChild(logs.firstChild);
                 logIndex++;
             }
@@ -375,12 +469,11 @@ class AnimationEngine {
                         UIManager.scrambleText(h1);
                         h1.addEventListener("mouseenter", () => {
                             UIManager.scrambleText(h1);
-                            AudioEngine.playGlitch();
                         });
                     }
-                }, 400);
+                }, 300);
             }
-        }, 20);
+        }, 15);
     }
 }
 
@@ -389,7 +482,6 @@ class AnimationEngine {
 // ==========================================
 class UIManager {
     static init() {
-        this.initAudioInteractions();
         this.initTabListener();
         this.initClickEffects();
         this.initConsoleSignature();
@@ -436,16 +528,13 @@ class UIManager {
         if (!grid) return;
         grid.innerHTML = data.map(p => `
             <div class="project-card p-8 opacity-0 translate-y-8 group relative flex flex-col h-full">
-                <div class="admin-controls">
-                    <button class="admin-action-btn edit-btn" onclick="AdminController.openEditModal('project', ${p.id}, event)">EDIT</button>
-                    <button class="admin-action-btn del-btn" onclick="AdminController.deleteItem('project', ${p.id}, event)">DEL</button>
-                </div>
                 <div class="mb-6 border-b border-gray-500/20 pb-6">
                      <h3 class="text-3xl font-bold mb-2">${Utils.escapeHTML(p.title)}</h3>
                 </div>
                 <p class="text-sm text-secondary mb-8 leading-relaxed flex-grow">${Utils.escapeHTML(p.description)}</p>
-                <div class="flex justify-between text-xs font-mono tracking-widest mt-auto">
-                    <a href="${Utils.escapeHTML(p.project_url)}" target="_blank" class="hover:text-accent">[ VIEW PROJECT ]</a>
+                <div class="flex justify-between items-center text-xs font-mono tracking-widest mt-auto">
+                    <a href="${Utils.escapeHTML(p.project_url)}" target="_blank" rel="noopener noreferrer" class="hover:text-accent">[ VIEW PROJECT ]</a>
+                    ${p.repo_url && p.repo_url !== '#' ? `<a href="${Utils.escapeHTML(p.repo_url)}" target="_blank" rel="noopener noreferrer" class="text-secondary/60 hover:text-accent">[ REPO ]</a>` : ''}
                 </div>
             </div>
         `).join("");
@@ -457,11 +546,7 @@ class UIManager {
         const container = document.getElementById("skills-container");
         if (!container) return;
         container.innerHTML = data.map(s => `
-            <div class="skill-tag px-4 py-3 opacity-0 translate-y-4 text-xs font-mono border border-gray-500/30 transition-colors cursor-default relative overflow-hidden">
-                <div class="admin-controls">
-                    <button class="admin-action-btn edit-btn text-[0.5rem] px-1.5 py-0.5 h-auto min-h-0" onclick="AdminController.openEditModal('skill', ${s.id}, event)">EDIT</button>
-                    <button class="admin-action-btn del-btn text-[0.5rem] px-1.5 py-0.5 h-auto min-h-0" onclick="AdminController.deleteItem('skill', ${s.id}, event)">DEL</button>
-                </div>
+            <div class="skill-tag px-4 py-3 opacity-0 translate-y-4 text-xs font-mono border border-gray-500/30 transition-colors relative overflow-hidden">
                 ${Utils.escapeHTML(s.name)}
             </div>
         `).join("");
@@ -474,10 +559,6 @@ class UIManager {
         if (!container) return;
         container.innerHTML = data.map(exp => `
             <div class="info-card p-6 opacity-0 translate-y-8 border-l-2 border-transparent transition-all relative">
-                <div class="admin-controls">
-                    <button class="admin-action-btn edit-btn" onclick="AdminController.openEditModal('experience', ${exp.id}, event)">EDIT</button>
-                    <button class="admin-action-btn del-btn" onclick="AdminController.deleteItem('experience', ${exp.id}, event)">DEL</button>
-                </div>
                 <h4 class="font-bold text-lg">${Utils.escapeHTML(exp.position)}</h4>
                 <p class="text-sm font-mono mb-4 text-secondary">${Utils.escapeHTML(exp.company)}</p>
                 <p class="text-sm text-secondary/80 leading-relaxed">${Utils.escapeHTML(exp.description)}</p>
@@ -492,10 +573,6 @@ class UIManager {
         if (!container) return;
         container.innerHTML = data.map(item => `
             <div class="info-card p-6 opacity-0 translate-y-8 relative">
-                <div class="admin-controls">
-                    <button class="admin-action-btn edit-btn" onclick="AdminController.openEditModal('${type}', ${item.id}, event)">EDIT</button>
-                    <button class="admin-action-btn del-btn" onclick="AdminController.deleteItem('${type}', ${item.id}, event)">DEL</button>
-                </div>
                 <h4 class="font-bold text-lg mb-1">${Utils.escapeHTML(item.degree || item.title || item.name)}</h4>
                 <p class="text-sm font-mono text-accent">${Utils.escapeHTML(item.institution || item.issuing_organization || '')}</p>
                 ${item.description ? `<p class="text-sm text-secondary/80 mt-2">${Utils.escapeHTML(item.description)}</p>` : ''}
@@ -515,44 +592,32 @@ class UIManager {
             const originalText = btn.innerText;
             btn.classList.add("loading");
             btn.innerText = "TRANSMITTING...";
-            AudioEngine.playClick();
 
             const formData = Object.fromEntries(new FormData(form));
             try {
-                await ApiService.post('contacts_api.php', formData);
-                
-                // Formspree Integration
+                // Direct Formspree submission without PHP/backend requirement
                 const formspreeId = "xreezznd";
-                if (formspreeId !== "YOUR_FORMSPREE_ID") {
-                    await fetch(`https://formspree.io/f/${formspreeId}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(formData) }).catch(()=>console.warn('Formspree failed'));
-                }
+                const response = await fetch(`https://formspree.io/f/${formspreeId}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) throw new Error("Transmission failed");
 
                 btn.classList.remove("loading");
                 btn.classList.add("success");
                 btn.innerText = "TRANSMISSION RECEIVED";
                 form.reset();
+                this.showToast("Message transmitted successfully.", "success");
                 setTimeout(() => { btn.classList.remove("success"); btn.innerText = originalText; }, 3000);
-            } catch (e) {
+            } catch (err) {
                 btn.classList.remove("loading");
                 btn.innerText = "ERROR - RETRY";
                 btn.style.borderColor = "red";
-                this.showToast("Failed to send message.", "error");
+                this.showToast("Failed to transmit message. Please check connection.", "error");
+                setTimeout(() => { btn.innerText = originalText; btn.style.borderColor = ""; }, 3000);
             }
-        });
-    }
-
-    static initAudioInteractions() {
-        const startAudio = () => {
-            if (!AudioEngine.ctx) AudioEngine.init();
-            if (AudioEngine.ctx.state === "suspended") AudioEngine.ctx.resume();
-            document.removeEventListener("click", startAudio);
-        };
-        document.addEventListener("click", startAudio);
-        document.body.addEventListener("mouseenter", (e) => {
-            if (e.target.closest("a, button, .project-card, .magnetic-wrap")) AudioEngine.playHover();
-        }, true);
-        document.body.addEventListener("click", (e) => {
-            if (e.target.closest("a, button, .theme-toggle")) AudioEngine.playClick();
         });
     }
 
@@ -573,7 +638,7 @@ class UIManager {
     }
 
     static initConsoleSignature() {
-        console.log("%c SECURE ADMIN SYSTEM ONLINE ", "background: #0f172a; color: #22d3ee; padding: 10px; border: 1px solid #22d3ee;");
+        console.log("%c PORTFOLIO SYSTEM ONLINE ", "background: #0f172a; color: #22d3ee; padding: 10px; border: 1px solid #22d3ee; font-weight: bold;");
     }
 
     static initKonamiCode() {
@@ -585,7 +650,6 @@ class UIManager {
                 if (current === code.length) {
                     document.documentElement.style.setProperty("--accent", "#ff00ff");
                     document.body.style.filter = "invert(1) hue-rotate(180deg)";
-                    AudioEngine.playGlitch();
                     current = 0;
                 }
             } else current = 0;
@@ -595,7 +659,7 @@ class UIManager {
     static initScrollSpy() {
         const observerOptions = {
             root: null,
-            rootMargin: "-20% 0px -70% 0px", // Trigger when section hits upper third of screen
+            rootMargin: "-20% 0px -70% 0px",
             threshold: 0
         };
 
@@ -635,334 +699,43 @@ class UIManager {
 }
 
 // ==========================================
-// ADMIN CONTROLLER
-// ==========================================
-class AdminController {
-    static init() {
-        const btn = document.getElementById("admin-btn");
-        if (btn) btn.addEventListener("click", () => this.toggleAdminMode(btn));
-
-        const form = document.getElementById("edit-form");
-        if (form) form.addEventListener("submit", (e) => this.handleEditSubmit(e));
-        
-        // Expose openAddModal globally for HTML inline onclick
-        window.openAddModal = (type, e) => this.openAddModal(type, e);
-        
-        this.setupDeleteModal();
-
-        // Close modals on Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                const editModal = document.getElementById("edit-modal");
-                if (editModal && editModal.style.display === 'flex') this.closeEditModal();
-                
-                const deleteModal = document.getElementById("delete-modal");
-                if (deleteModal && deleteModal.style.display === 'flex') this.closeDeleteModal();
-            }
-        });
-    }
-
-    static toggleAdminMode(btn) {
-        const isActive = document.body.classList.toggle("admin-mode");
-        btn.classList.toggle("active");
-        btn.classList.toggle("slashed-btn", !isActive);
-        AudioEngine.playClick();
-
-        if (document.body.classList.contains("admin-mode")) {
-            if (!ApiService.getApiKey()) {
-                const key = prompt("Admin Mode Activated.\nTo edit/delete items, please enter your API_KEY from the .env file:");
-                if (key) {
-                    sessionStorage.setItem('PORTFOLIO_API_KEY', key.trim());
-                    UIManager.showToast("API Key registered for session.", "success");
-                } else {
-                    document.body.classList.remove("admin-mode");
-                    btn.classList.remove("active");
-                    UIManager.showToast("Admin Mode cancelled (No key provided).", "error");
-                }
-            } else {
-                UIManager.showToast("Admin Mode Active (Key present in session).", "success");
-            }
-        }
-    }
-
-    static getEndpoints() {
-        return {
-            'project': 'projects_api.php',
-            'skill': 'skills_api.php',
-            'experience': 'experience_api.php',
-            'education': 'education_api.php',
-            'certification': 'certifications_api.php',
-            'achievement': 'achievements_api.php',
-            'hobby': 'hobbies_api.php'
-        };
-    }
-
-    static showModalWithGSAP(modalId, triggerElement) {
-        const modal = document.getElementById(modalId);
-        const content = modal.querySelector('.modal-content');
-        
-        const showContent = () => {
-            modal.style.display = 'flex';
-            gsap.killTweensOf([modal, content]);
-            gsap.fromTo(modal, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" });
-            gsap.fromTo(content,
-                { scale: 0.9, opacity: 0, y: 20 },
-                { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: "expo.out", delay: 0.05 }
-            );
-        };
-
-        if (document.startViewTransition && triggerElement) {
-            triggerElement.style.viewTransitionName = 'modal-morph';
-            content.style.viewTransitionName = 'modal-morph';
-            
-            const transition = document.startViewTransition(() => {
-                modal.style.display = 'flex';
-            });
-            
-            transition.finished.finally(() => {
-                triggerElement.style.viewTransitionName = '';
-                content.style.viewTransitionName = '';
-                // Keep track of the active trigger element for hiding later
-                modal.dataset.triggerId = triggerElement.id || ''; 
-                if (!triggerElement.id) {
-                    triggerElement.id = 'temp-trigger-' + Date.now();
-                    modal.dataset.triggerId = triggerElement.id;
-                }
-            });
-        } else {
-            showContent();
-        }
-    }
-
-    static hideModalWithGSAP(modalId) {
-        const modal = document.getElementById(modalId);
-        const content = modal.querySelector('.modal-content');
-        
-        const hideContent = () => {
-            gsap.killTweensOf([modal, content]);
-            gsap.to(content, { scale: 0.95, opacity: 0, y: -10, duration: 0.2, ease: "power2.in" });
-            gsap.to(modal, {
-                opacity: 0, duration: 0.3, ease: "power2.in", delay: 0.1,
-                onComplete: () => { modal.style.display = 'none'; }
-            });
-        };
-
-        if (document.startViewTransition && modal.dataset.triggerId) {
-            const triggerElement = document.getElementById(modal.dataset.triggerId);
-            if (triggerElement) {
-                triggerElement.style.viewTransitionName = 'modal-morph';
-                content.style.viewTransitionName = 'modal-morph';
-                
-                const transition = document.startViewTransition(() => {
-                    modal.style.display = 'none';
-                });
-                
-                transition.finished.finally(() => {
-                    triggerElement.style.viewTransitionName = '';
-                    content.style.viewTransitionName = '';
-                    modal.dataset.triggerId = '';
-                });
-                return;
-            }
-        }
-        hideContent();
-    }
-
-    static openEditModal(type, id, e) {
-        const modal = document.getElementById("edit-modal");
-        const trigger = e ? e.currentTarget : null;
-        let item = null;
-        
-        if (type === "project") item = App.state.projects.find(i => i.id == id);
-        else if (type === "skill") item = App.state.skills.find(i => i.id == id);
-        else item = App.state.generic[`${type}s-list`]?.find(i => i.id == id);
-
-        if (!item) return;
-
-        document.getElementById("edit-id").value = id;
-        document.getElementById("edit-type").value = type;
-        document.getElementById("edit-title").value = item.title || item.name || item.position || item.degree || "";
-        document.getElementById("edit-subtitle").value = item.project_url || item.status || item.company || item.institution || item.issuing_organization || "";
-        document.getElementById("edit-desc").value = item.description || "";
-        
-        this.toggleModalFields(type);
-        this.showModalWithGSAP("edit-modal", trigger);
-    }
-
-    static openAddModal(type, e) {
-        const modal = document.getElementById("edit-modal");
-        const trigger = e ? e.currentTarget : null;
-        document.getElementById("edit-form").reset();
-        document.getElementById("edit-id").value = ""; 
-        document.getElementById("edit-type").value = type;
-        
-        this.toggleModalFields(type);
-        this.showModalWithGSAP("edit-modal", trigger);
-    }
-
-    static toggleModalFields(type) {
-        const groupSubtitle = document.getElementById("group-subtitle");
-        const groupDesc = document.getElementById("group-desc");
-        const labelSubtitle = document.getElementById("label-subtitle");
-        
-        groupSubtitle.style.display = "block";
-        groupDesc.style.display = "block";
-        if (labelSubtitle) labelSubtitle.innerText = type === "project" ? "Project URL" : "Subtitle / Role";
-
-        if (type === "skill") {
-            groupDesc.style.display = "none";
-            groupSubtitle.style.display = "none";
-        } else if (["education", "certification", "achievement"].includes(type)) {
-            groupDesc.style.display = "none";
-        } else if (type === "hobby") {
-            groupSubtitle.style.display = "none";
-        }
-    }
-
-    static closeEditModal() {
-        this.hideModalWithGSAP("edit-modal");
-    }
-
-    static async handleEditSubmit(e) {
-        e.preventDefault();
-        const formData = Object.fromEntries(new FormData(e.target));
-        const { type, id, title, subtitle, description } = formData;
-        const endpoints = this.getEndpoints();
-        const endpoint = endpoints[type];
-
-        if (!endpoint) return UIManager.showToast("Save not implemented for this type.", "error");
-
-        const payload = { action: id ? "update" : "add", id, title, description, name: title, position: title, degree: title, company: subtitle, institution: subtitle, issuing_organization: subtitle, project_url: subtitle };
-
-        try {
-            const btn = e.target.querySelector('button[type="submit"]');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = `SAVING <span class="animate-pulse">...</span>`;
-            btn.classList.add("loading");
-            btn.disabled = true;
-
-            await ApiService.post(endpoint, payload);
-            
-            UIManager.showToast("CHANGES SAVED", "success");
-            this.closeEditModal();
-            setTimeout(() => location.reload(), 1000);
-        } catch (err) {
-            UIManager.showToast("ERROR: " + (err.message || "Unauthorized or Server Error"), "error");
-            if (err.status === 401) {
-                // Clear invalid key
-                sessionStorage.removeItem('PORTFOLIO_API_KEY');
-                UIManager.showToast("API Key invalid or expired. Turn Admin Mode off and on again.", "error");
-            }
-            const btn = e.target.querySelector('button[type="submit"]');
-            btn.innerHTML = "RETRY SAVE";
-            btn.classList.remove("loading");
-            btn.disabled = false;
-        }
-    }
-
-    static setupDeleteModal() {
-        const cancelBtn = document.getElementById("cancel-delete");
-        const confirmBtn = document.getElementById("confirm-delete");
-        const backdrop = document.getElementById("delete-backdrop");
-
-        if (cancelBtn) cancelBtn.addEventListener("click", () => this.closeDeleteModal());
-        if (backdrop) backdrop.addEventListener("click", () => this.closeDeleteModal());
-        if (confirmBtn) {
-            confirmBtn.addEventListener("click", () => {
-                if (this.deleteConfirmCallback) this.deleteConfirmCallback();
-                this.closeDeleteModal();
-            });
-        }
-    }
-
-    static deleteItem(type, id, e) {
-        const modal = document.getElementById("delete-modal");
-        const trigger = e ? e.currentTarget : null;
-        const messageEl = document.getElementById("delete-message");
-        if (messageEl) {
-            messageEl.innerHTML = `Are you sure you want to delete this ${type}? <br><span class="text-[#ef4444] font-bold mt-4 block uppercase tracking-widest text-xs border border-[#ef4444] p-2 inline-block bg-[rgba(239,68,68,0.1)]">⚠ This action cannot be undone.</span>`;
-        }
-        this.deleteConfirmCallback = () => this.performDelete(type, id);
-        this.showModalWithGSAP("delete-modal", trigger);
-    }
-
-    static closeDeleteModal() {
-        this.hideModalWithGSAP("delete-modal");
-        this.deleteConfirmCallback = null;
-    }
-
-    static async performDelete(type, id) {
-        const endpoint = this.getEndpoints()[type];
-        if (!endpoint) return;
-
-        try {
-            await ApiService.post(endpoint, { action: "delete", id });
-            UIManager.showToast(`${type.toUpperCase()} DELETED SUCCESSFULLY`, "success");
-            setTimeout(() => location.reload(), 1000);
-        } catch (err) {
-            UIManager.showToast("DELETE FAILED: " + (err.message || "Unauthorized"), "error");
-        }
-    }
-}
-
-// ==========================================
 // APP INITIALIZATION
 // ==========================================
 class App {
-    static state = {
-        projects: [],
-        skills: [],
-        generic: {}
-    };
-
     static init() {
-        AudioEngine.init();
         AnimationEngine.init();
         UIManager.init();
-        AdminController.init();
-        this.loadAllData();
-        
-        // Expose global for inline HTML toggleMute calls
-        window.toggleMute = () => AudioEngine.toggleMute();
+
+        this.renderAllData();
     }
 
-    static async loadAllData() {
-        try {
-            const profile = await ApiService.get('profile_api.php');
-            document.getElementById("professional-title").innerText = profile.professional_title;
-            document.getElementById("bio-text").innerText = profile.bio;
-            document.getElementById("contact-info").innerHTML = `
+    static renderAllData() {
+        const profile = PORTFOLIO_DATA.profile;
+        
+        // Render Profile
+        const titleEl = document.getElementById("professional-title");
+        if (titleEl) titleEl.innerText = profile.professional_title;
+
+        const bioEl = document.getElementById("bio-text");
+        if (bioEl) bioEl.innerText = profile.bio;
+
+        const contactInfoEl = document.getElementById("contact-info");
+        if (contactInfoEl) {
+            contactInfoEl.innerHTML = `
                 <div class="flex justify-between border-b border-gray-500/30 pb-2"><span>EMAIL</span> <span>${Utils.escapeHTML(profile.email)}</span></div>
                 <div class="flex justify-between border-b border-gray-500/30 pb-2 pt-2"><span>PHONE</span> <span>${Utils.escapeHTML(profile.phone)}</span></div>
-                <div class="pt-4"><a href="${Utils.escapeHTML(profile.facebook_url)}" target="_blank" class="text-accent hover:underline">FACEBOOK LINK_</a></div>
+                <div class="pt-4"><a href="${Utils.escapeHTML(profile.facebook_url)}" target="_blank" rel="noopener noreferrer" class="text-accent hover:underline">FACEBOOK LINK_</a></div>
             `;
-        } catch (e) { console.error("Error loading profile"); }
-
-        try {
-            this.state.projects = await ApiService.get('projects_api.php');
-            UIManager.renderProjects(this.state.projects);
-        } catch (e) {}
-
-        try {
-            this.state.skills = await ApiService.get('skills_api.php');
-            UIManager.renderSkills(this.state.skills);
-        } catch (e) {}
-
-        this.loadGeneric('experience_api.php?duration=true', 'experiences-list', UIManager.renderExperience);
-        this.loadGeneric('education_api.php', 'educations-list', (d) => UIManager.renderSimpleCard('education', d, 'education-list'));
-        this.loadGeneric('certifications_api.php', 'certifications-list', (d) => UIManager.renderSimpleCard('certification', d, 'certifications-list'));
-        this.loadGeneric('achievements_api.php', 'achievements-list', (d) => UIManager.renderSimpleCard('achievement', d, 'achievements-list'));
-        this.loadGeneric('hobbies_api.php', 'hobbies-list', (d) => UIManager.renderSimpleCard('hobby', d, 'hobbies-list'));
-    }
-
-    static async loadGeneric(endpoint, stateKey, renderFn) {
-        try {
-            const data = await ApiService.get(endpoint);
-            this.state.generic[stateKey] = data;
-            renderFn(data);
-        } catch (e) {
-            console.error(`Error loading generic data: ${endpoint}`);
         }
+
+        // Render Portfolio Sections
+        UIManager.renderProjects(PORTFOLIO_DATA.projects);
+        UIManager.renderSkills(PORTFOLIO_DATA.skills);
+        UIManager.renderSimpleCard('hobby', PORTFOLIO_DATA.hobbies, 'hobbies-list');
+        UIManager.renderExperience(PORTFOLIO_DATA.experience);
+        UIManager.renderSimpleCard('education', PORTFOLIO_DATA.education, 'education-list');
+        UIManager.renderSimpleCard('certification', PORTFOLIO_DATA.certifications, 'certifications-list');
+        UIManager.renderSimpleCard('achievement', PORTFOLIO_DATA.achievements, 'achievements-list');
     }
 }
 
