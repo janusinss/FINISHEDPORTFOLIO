@@ -23,29 +23,25 @@ const PORTFOLIO_DATA = {
             id: 1,
             title: "SayLess Company Website",
             description: "A professional website for a tech company called 'SayLess' that specializes in building digital experiences, such as premium websites and applications. It features a portfolio of their work (including a Research Ethics Office portal), a list of team members (with Janus Dominic as Project Manager), and a blog with industry insights.",
-            project_url: "https://sayless.click/",
-            repo_url: "https://github.com/janusinss/sayless"
+            project_url: "https://sayless.click/"
         },
         {
             id: 2,
             title: "QuickNote",
             description: "A simple web utility designed for fast, frictionless text capture. It lets you open a page, type your thoughts immediately, and keep quick reference notes accessible across your devices.",
-            project_url: "https://quicknote.ct.ws/",
-            repo_url: "https://github.com/janusinss/freshcart"
+            project_url: "https://quicknote.ct.ws/"
         },
         {
             id: 3,
             title: "Fitness Gym (Old Project)",
             description: "A promotional landing page for a local gym ('Fitness Gym'). It outlines the gym's offerings, including basic equipment (cardio, weights), training guides (moderate to expert levels), and opportunities to become a trainer.",
-            project_url: "https://dominic-lab09.netlify.app/#",
-            repo_url: "https://github.com/janusinss/fitness-gym"
+            project_url: "https://dominic-lab09.netlify.app/#"
         },
         {
             id: 4,
             title: "BlitzType",
             description: "A typing game that challenges players to type as fast as possible. It features a leaderboard and a timer to keep track of the player's progress.",
-            project_url: "https://blitztype-5cd8b.web.app/",
-            repo_url: "#"
+            project_url: "https://blitztype-5cd8b.web.app/"
         }
     ],
     skills: [
@@ -548,9 +544,8 @@ class UIManager {
                      <h3 class="text-3xl font-bold mb-2">${Utils.escapeHTML(p.title)}</h3>
                 </div>
                 <p class="text-sm text-secondary mb-8 leading-relaxed flex-grow">${Utils.escapeHTML(p.description)}</p>
-                <div class="flex justify-between items-center text-xs font-mono tracking-widest mt-auto">
-                    <a href="${Utils.sanitizeURL(p.project_url)}" target="_blank" rel="noopener noreferrer" class="hover:text-accent">[ VIEW PROJECT ]</a>
-                    ${p.repo_url && p.repo_url !== '#' ? `<a href="${Utils.sanitizeURL(p.repo_url)}" target="_blank" rel="noopener noreferrer" class="text-secondary/60 hover:text-accent">[ REPO ]</a>` : ''}
+                <div class="flex items-center text-xs font-mono tracking-widest mt-auto">
+                    <a href="${Utils.sanitizeURL(p.project_url)}" target="_blank" rel="noopener noreferrer" class="hover:text-accent transition-colors">[ VIEW PROJECT ]</a>
                 </div>
             </div>
         `).join("");
